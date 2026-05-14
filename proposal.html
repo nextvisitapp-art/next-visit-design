@@ -1,0 +1,1492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Unified system proposal — Next Visit + Go</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Phosphor icons (regular weight stylesheet) -->
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+
+<style>
+  :root {
+    /* Brand */
+    --pink-50:  #FFF2F5;
+    --pink-100: #FFE0E8;
+    --pink-200: #FCBED0;
+    --pink-300: #F89BB6;
+    --pink-400: #F4719A;
+    --pink-500: #F43F6A;   /* primary */
+    --pink-600: #D72955;
+    --pink-700: #A8203F;
+
+    --cream:    #FDF0F0;
+    --cream-2:  #FFF7F7;
+    --white:    #FFFFFF;
+
+    --ink:        #1A1A1A;
+    --ink-soft:   #6B6B6B;
+    --ink-faint:  #999999;
+
+    --border:        rgba(244, 63, 106, 0.12);
+    --border-hover:  rgba(244, 63, 106, 0.30);
+    --border-active: rgba(244, 63, 106, 0.50);
+    --hairline:      rgba(26, 26, 26, 0.08);
+
+    --shadow-sm: 0 1px 2px rgba(244,63,106,.06), 0 4px 12px rgba(244,63,106,.05);
+    --shadow-md: 0 4px 12px rgba(244,63,106,.08), 0 12px 32px rgba(244,63,106,.06);
+    --shadow-lg: 0 8px 24px rgba(244,63,106,.10), 0 32px 64px rgba(244,63,106,.08);
+
+    --sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: "Fraunces", Georgia, serif;
+    --mono:  "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    --r-xs: 6px;
+    --r-sm: 10px;
+    --r-md: 14px;
+    --r-lg: 20px;
+    --r-pill: 9999px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--cream);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .doc {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 64px 32px 128px;
+  }
+
+  /* ================= MASTHEAD ================= */
+  .masthead {
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+  }
+  .crumb {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pink-500);
+  }
+  .crumb .dot { color: var(--ink-faint); margin: 0 8px; font-weight: 400; }
+  h1.title {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 52px;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin: 16px 0 12px;
+    text-wrap: pretty;
+  }
+  h1.title em { font-style: italic; color: var(--pink-500); font-weight: 600; }
+  .deck {
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 660px;
+    text-wrap: pretty;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 32px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .meta-row b { display: block; color: var(--ink-faint); font-weight: 600; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+
+  /* ================= SECTION CHROME ================= */
+  section { margin: 80px 0; }
+  section.tight { margin: 56px 0; }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 36px;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin: 0 0 8px;
+    text-wrap: pretty;
+  }
+  h2 em { font-style: italic; color: var(--pink-500); font-weight: 600; }
+  h2 .num {
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--pink-500);
+    display: block;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  h3 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: -0.005em;
+    margin: 40px 0 10px;
+  }
+  h4 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 28px 0 8px;
+  }
+  p { margin: 0 0 14px; }
+  p + p { margin-top: 0; }
+  .lede {
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin-bottom: 24px;
+  }
+  hr.rule {
+    border: 0;
+    border-top: 1px solid var(--hairline);
+    margin: 64px 0;
+  }
+  code {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: var(--cream-2);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--ink);
+    border: 1px solid var(--hairline);
+  }
+
+  /* ================= SHARED VS SPLIT TABLE ================= */
+  .principle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .principle {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+  }
+  .principle h4 { margin-top: 0; color: var(--pink-500); }
+  .principle ul {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14.5px;
+  }
+  .principle ul li {
+    padding: 8px 0;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+  }
+  .principle ul li:first-child { border-top: 0; }
+  .principle ul li i {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    min-width: 28px;
+    letter-spacing: 0.04em;
+  }
+  @media (max-width: 640px) { .principle-grid { grid-template-columns: 1fr; } }
+
+  /* ================= COLOR PALETTE ================= */
+  .ramp {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .ramp .swatch {
+    aspect-ratio: 1;
+    border-radius: var(--r-sm);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 10px;
+    border: 1px solid var(--hairline);
+    font-family: var(--mono);
+    font-size: 10.5px;
+  }
+  .ramp .swatch b { display: block; font-size: 11px; font-weight: 600; }
+  .ramp .swatch.light { color: var(--ink); }
+  .ramp .swatch.dark  { color: var(--white); }
+  .ramp .swatch.is-primary { outline: 2px solid var(--pink-500); outline-offset: 2px; }
+
+  .stack {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .stack .stk {
+    aspect-ratio: 2.5;
+    border-radius: var(--r-sm);
+    padding: 12px;
+    border: 1px solid var(--hairline);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .stack .stk b { font-size: 11px; }
+
+  /* ================= TYPE SAMPLES ================= */
+  .type-stack { background: var(--white); border:1px solid var(--border); border-radius: var(--r-md); padding: 32px; margin-top: 16px; }
+  .type-row { display: flex; align-items: baseline; gap: 24px; padding: 14px 0; border-top: 1px solid var(--hairline); }
+  .type-row:first-child { border-top: 0; padding-top: 0; }
+  .type-row .meta { min-width: 200px; font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); }
+  .type-row .meta b { display: block; color: var(--ink); font-weight: 600; font-size: 13px; font-family: var(--sans); margin-bottom: 2px; }
+  .type-row .sample { color: var(--ink); }
+  .t-display { font-family: var(--serif); font-weight: 600; font-size: 44px; line-height: 1.05; letter-spacing: -0.01em; }
+  .t-display em { font-style: italic; color: var(--pink-500); }
+  .t-h1 { font-family: var(--serif); font-weight: 600; font-size: 32px; line-height: 1.12; }
+  .t-h1 em { font-style: italic; color: var(--pink-500); }
+  .t-h2 { font-family: var(--serif); font-weight: 600; font-size: 22px; line-height: 1.15; }
+  .t-h2 em { font-style: italic; color: var(--pink-500); }
+  .t-body { font-family: var(--sans); font-weight: 400; font-size: 16px; color: var(--ink); }
+  .t-body-soft { font-family: var(--sans); font-weight: 400; font-size: 15px; color: var(--ink-soft); }
+  .t-label { font-family: var(--sans); font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+  .t-button { font-family: var(--sans); font-weight: 600; font-size: 15px; }
+  .t-mono { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+
+  /* ================= SCALE BAR ================= */
+  .scale-bar { display: flex; align-items: flex-end; gap: 0; margin-top: 16px; padding: 24px; background: var(--white); border:1px solid var(--border); border-radius: var(--r-md); height: 140px; position: relative; }
+  .scale-bar .bar { background: var(--pink-200); border-radius: 2px 2px 0 0; position: relative; }
+  .scale-bar .bar::after {
+    content: attr(data-val);
+    position: absolute;
+    bottom: -22px; left: 50%; transform: translateX(-50%);
+    font-family: var(--mono); font-size: 10.5px; color: var(--ink-soft);
+  }
+  .scale-bar .gap { width: 12px; }
+
+  /* ================= PRIMITIVES ================= */
+  .prim {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 28px;
+    margin: 20px 0;
+    box-shadow: var(--shadow-sm);
+  }
+  .prim-head { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; margin-bottom: 6px; }
+  .prim-head h3 { margin: 0; }
+  .prim-head .id { font-family: var(--mono); font-size: 11px; color: var(--pink-500); font-weight: 600; letter-spacing: 0.04em; }
+  .prim p.use { color: var(--ink-soft); font-size: 14.5px; margin-bottom: 14px; max-width: 600px; }
+
+  .demo-row { 
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0 8px;
+  }
+  .demo {
+    background: var(--cream);
+    border: 1px dashed var(--border-hover);
+    border-radius: var(--r-md);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    min-height: 140px;
+    position: relative;
+  }
+  .demo > .ctx-label {
+    position: absolute;
+    top: 8px; left: 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--pink-500);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .demo.go { background: var(--cream-2); }
+  .demo.couples { background: var(--cream); }
+  @media (max-width: 640px) { .demo-row { grid-template-columns: 1fr; } }
+
+  .spec {
+    margin-top: 12px;
+    background: var(--cream-2);
+    border-radius: var(--r-sm);
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border: 1px solid var(--hairline);
+  }
+  .spec b { color: var(--ink); font-weight: 600; }
+  .spec .k { color: var(--pink-600); }
+
+  /* ================= BUTTONS (LIVE) ================= */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1;
+    padding: 14px 20px;
+    border-radius: var(--r-pill);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform .15s ease, background .15s ease, box-shadow .15s ease, border-color .15s ease;
+    text-decoration: none;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--pink-500); color: var(--white); box-shadow: 0 6px 14px rgba(244,63,106,0.25); }
+  .btn-primary:hover { background: var(--pink-600); }
+  .btn-secondary { background: var(--white); color: var(--ink); border-color: var(--border); }
+  .btn-secondary:hover { border-color: var(--border-hover); }
+  .btn-tertiary { background: transparent; color: var(--pink-500); padding-left: 4px; padding-right: 4px; }
+  .btn-ai {
+    background: linear-gradient(135deg, var(--pink-50), var(--cream));
+    color: var(--pink-600);
+    border: 1px dashed var(--border-active);
+  }
+  .btn-ai:hover { background: linear-gradient(135deg, var(--pink-100), var(--cream)); }
+  .btn-block { display: flex; width: 100%; }
+  .btn-sm { padding: 10px 14px; font-size: 13.5px; }
+  .btn .ph { font-size: 18px; }
+
+  /* ================= CARD ================= */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+  .card .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; margin-bottom: 8px; }
+  .card h6 { margin: 0 0 4px; font-family: var(--sans); font-weight: 600; font-size: 16px; }
+  .card p.desc { margin: 0; font-size: 14px; color: var(--ink-soft); }
+
+  /* ================= INPUTS ================= */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; }
+  .input {
+    font-family: var(--sans);
+    font-size: 15px;
+    padding: 12px 14px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--ink);
+    outline: 0;
+    transition: border-color .15s ease;
+  }
+  .input::placeholder { color: var(--ink-faint); }
+  .input:focus { border-color: var(--pink-500); box-shadow: 0 0 0 3px rgba(244,63,106,0.12); }
+
+  /* ================= CHIPS ================= */
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-pill);
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .chip:hover { border-color: var(--border-hover); }
+  .chip.is-active { background: var(--pink-50); border-color: var(--pink-300); color: var(--pink-600); }
+  .chip .ph { font-size: 14px; color: var(--pink-500); }
+
+  /* ================= SEGMENTED ================= */
+  .segmented {
+    display: inline-flex;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: var(--r-pill);
+    padding: 4px;
+    gap: 0;
+  }
+  .segmented .seg {
+    padding: 8px 16px;
+    border-radius: var(--r-pill);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all .15s ease;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .segmented .seg.is-active {
+    background: var(--white);
+    color: var(--pink-500);
+    box-shadow: 0 2px 6px rgba(244,63,106,0.10);
+  }
+
+  /* ================= COUNTDOWN ================= */
+  .countdown {
+    background: linear-gradient(135deg, var(--pink-500), var(--pink-400));
+    color: var(--white);
+    border-radius: var(--r-lg);
+    padding: 28px;
+    box-shadow: 0 12px 32px rgba(244,63,106,0.20);
+    position: relative;
+    overflow: hidden;
+  }
+  .countdown.go-variant {
+    padding-top: 0;
+  }
+  .countdown .hero-img {
+    margin: -28px -28px 24px;
+    height: 140px;
+    background: repeating-linear-gradient(135deg, rgba(255,255,255,0.10) 0 12px, rgba(255,255,255,0.04) 12px 24px), linear-gradient(135deg, var(--pink-600), var(--pink-400));
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.7);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .countdown .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 12px;
+  }
+  .countdown .place {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 26px;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .countdown .place em { font-style: italic; color: rgba(255,255,255,0.85); font-weight: 500; }
+  .countdown .meta {
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.82);
+    margin-bottom: 18px;
+  }
+  .countdown .numeral {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 84px;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    display: flex; align-items: baseline; gap: 14px;
+  }
+  .countdown .numeral span.unit {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 18px;
+    color: rgba(255,255,255,0.85);
+  }
+  .countdown .actions {
+    display: flex; gap: 8px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+  }
+  .countdown .actions .btn-ghost {
+    flex: 1;
+    background: rgba(255,255,255,0.18);
+    color: var(--white);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.20);
+    padding: 10px 14px;
+    border-radius: var(--r-pill);
+    font-size: 13.5px;
+    font-weight: 600;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer;
+  }
+  .countdown .hearts {
+    position: absolute;
+    top: 16px; right: 18px;
+    font-size: 22px;
+    opacity: 0.35;
+  }
+
+  /* ================= AFFILIATE CARD ================= */
+  .affil {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 18px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    text-decoration: none;
+    color: var(--ink);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .affil:hover { border-color: var(--border-hover); box-shadow: var(--shadow-sm); }
+  .affil .mono {
+    width: 36px; height: 36px;
+    border-radius: var(--r-sm);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--sans); font-weight: 700; font-size: 14px;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+  .affil .meta { flex: 1; min-width: 0; }
+  .affil .meta b { display: block; font-size: 14.5px; font-weight: 600; color: var(--ink); }
+  .affil .meta span { font-size: 13px; color: var(--ink-soft); }
+  .affil .arrow { color: var(--ink-faint); font-size: 16px; }
+
+  /* ================= HANDOFF CARD ================= */
+  .handoff {
+    background: linear-gradient(135deg, var(--pink-500), var(--pink-400));
+    color: var(--white);
+    border-radius: var(--r-lg);
+    padding: 26px;
+  }
+  .handoff .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.78); margin-bottom: 10px;
+  }
+  .handoff h6 {
+    font-family: var(--serif); font-weight: 600; font-size: 26px; margin: 0 0 8px; line-height: 1.1;
+  }
+  .handoff h6 em { font-style: italic; color: rgba(255,255,255,0.92); font-weight: 500; }
+  .handoff p { color: rgba(255,255,255,0.85); font-size: 14px; margin: 0 0 18px; max-width: 360px; }
+  .handoff .btn-on-pink {
+    width: 100%;
+    background: var(--white); color: var(--pink-500);
+    padding: 14px;
+    border-radius: var(--r-pill);
+    font-weight: 600; font-size: 15px;
+    border: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .handoff .footnote {
+    margin-top: 12px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+  }
+
+  /* ================= ICON SHOWCASE ================= */
+  .icon-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .icon-grid .ic {
+    aspect-ratio: 1;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px;
+    color: var(--ink);
+  }
+  .icon-grid .ic i { font-size: 22px; color: var(--pink-500); }
+  .icon-grid .ic span { font-family: var(--mono); font-size: 10px; color: var(--ink-faint); }
+  @media (max-width: 640px) { .icon-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  /* ================= DENSITY MATRIX ================= */
+  .matrix {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    margin-top: 16px;
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--r-md);
+    overflow: hidden;
+    font-size: 13.5px;
+  }
+  .matrix th, .matrix td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  .matrix th { background: var(--cream); font-weight: 600; font-size: 11.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-faint); }
+  .matrix tr:last-child td { border-bottom: 0; }
+  .matrix td.k { font-weight: 600; }
+  .matrix td.v { font-family: var(--mono); font-size: 12px; color: var(--pink-600); }
+
+  /* ================= BRAND.MD BLOCK ================= */
+  .markdown-block {
+    background: #1A1A1A;
+    color: #FCBED0;
+    border-radius: var(--r-md);
+    padding: 28px 32px;
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    overflow-x: auto;
+  }
+  .markdown-block h1, .markdown-block h2, .markdown-block h3 { font-family: var(--mono); color: var(--white); margin: 22px 0 6px; }
+  .markdown-block h1 { font-size: 16px; margin-top: 0; }
+  .markdown-block h2 { font-size: 14px; color: var(--pink-200); }
+  .markdown-block h3 { font-size: 13px; color: var(--pink-300); }
+  .markdown-block .c { color: #999; }
+  .markdown-block .k { color: var(--pink-400); }
+  .markdown-block .v { color: #FFE0E8; }
+  .markdown-block p { color: #C8C8C8; margin: 4px 0 12px; }
+  .markdown-block ul { margin: 4px 0 12px; padding-left: 18px; color: #C8C8C8; }
+  .markdown-block ul li { padding: 2px 0; }
+  .markdown-block strong { color: var(--white); }
+
+  /* ================= ROADMAP ================= */
+  .road {
+    display: grid; gap: 14px;
+  }
+  .road-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--pink-500);
+    border-radius: var(--r-md);
+    padding: 18px 22px;
+  }
+  .road-card.w1 { border-left-color: #B91530; }
+  .road-card.w2 { border-left-color: #C26A06; }
+  .road-card.w3 { border-left-color: #4A7A3A; }
+  .road-card h5 { margin: 0 0 4px; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .road-card .ref { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.04em; margin-left: auto; }
+  .road-card p { font-size: 14px; color: var(--ink-soft); margin: 4px 0 0; }
+  .road-card .tags { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .road-card .tag { font-family: var(--mono); font-size: 10.5px; color: var(--pink-600); background: var(--pink-50); padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+
+  /* ================= CLOSER ================= */
+  .closer {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 40px;
+    box-shadow: var(--shadow-lg);
+    margin-top: 24px;
+  }
+  .closer h2 { margin-bottom: 12px; }
+  .closer p { font-size: 16px; color: var(--ink-soft); }
+  .closer ul { list-style: none; padding: 0; margin: 16px 0 0; font-size: 15px; }
+  .closer ul li { padding: 10px 0; border-top: 1px solid var(--hairline); color: var(--ink); }
+  .closer ul li:first-child { border-top: 0; }
+  .closer ul li b { font-weight: 600; color: var(--pink-500); margin-right: 10px; }
+
+  /* mini brand */
+  .wordmark {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .wordmark em { font-style: italic; color: var(--pink-500); }
+  .wordmark .glyph { color: var(--pink-500); font-size: 14px; }
+
+  /* List of figures of speech */
+  .voice-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  .voice-col {
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--r-md);
+    padding: 22px;
+  }
+  .voice-col h4 { color: var(--pink-500); margin-top: 0; }
+  .voice-col h5 { font-family: var(--sans); font-size: 13px; color: var(--ink); margin: 14px 0 6px; font-weight: 600; }
+  .voice-col p { font-size: 14px; color: var(--ink-soft); margin: 0 0 10px; font-style: italic; }
+  @media (max-width: 640px) { .voice-cols { grid-template-columns: 1fr; } }
+
+  @media (max-width: 640px) {
+    .doc { padding: 40px 18px 96px; }
+    h1.title { font-size: 36px; }
+    h2 { font-size: 26px; }
+    .prim { padding: 18px; }
+    .closer { padding: 24px; }
+    .ramp { grid-template-columns: repeat(4, 1fr); }
+    .stack { grid-template-columns: repeat(2, 1fr); }
+    .scale-bar { height: 100px; padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<main class="doc">
+
+  <!-- ============== MASTHEAD ============== -->
+  <header class="masthead">
+    <div class="crumb">Next Visit family <span class="dot">·</span> Unified system proposal <span class="dot">·</span> Step 2 of 3</div>
+    <h1 class="title">One brand, <em>two voices</em>, shared primitives.</h1>
+    <p class="deck">A unified design system that locks the brand without flattening the products. Calm for couples, efficient for go — same palette, same type, same scale, different density and chrome. Apple Photos vs Apple Wallet, not two different apps.</p>
+
+    <div class="meta-row">
+      <div><b>Approved direction</b>Two visual variants of one set of primitives</div>
+      <div><b>Icon family</b>Phosphor (regular + duotone)</div>
+      <div><b>Tech constraints</b>Couples React/Vite · Go single-file vanilla · Mobile-first</div>
+    </div>
+  </header>
+
+  <!-- ============== SECTION 1 — PRINCIPLE ============== -->
+  <section id="principle">
+    <h2><span class="num">Section 1 — principle</span>What&rsquo;s <em>shared</em>, what&rsquo;s <em>split</em></h2>
+    <p class="lede">The unification works because we&rsquo;re strict about what counts as &ldquo;the brand&rdquo; vs &ldquo;the product expression.&rdquo; Five things lock; five things flex. If a thing isn&rsquo;t on the left list, it can vary by product. If it&rsquo;s on the left, it cannot.</p>
+
+    <div class="principle-grid">
+      <div class="principle">
+        <h4>Shared — never varies</h4>
+        <ul>
+          <li><i>01</i><div><b>Color palette.</b> The pink ramp, cream/white surfaces, ink scale. No brand-specific accents. No blue.</div></li>
+          <li><i>02</i><div><b>Typography.</b> Fraunces headlines, system sans body, JetBrains Mono labels. Same scale ratios.</div></li>
+          <li><i>03</i><div><b>Primitives.</b> Button, card, input, chip, segmented. Identical anatomy, identical states.</div></li>
+          <li><i>04</i><div><b>Iconography.</b> Phosphor, regular weight. Same library, same stroke.</div></li>
+          <li><i>05</i><div><b>The countdown.</b> One component, one color, one anatomy. Shipped in both.</div></li>
+        </ul>
+      </div>
+      <div class="principle">
+        <h4>Variant — can flex per product</h4>
+        <ul>
+          <li><i>01</i><div><b>Density.</b> Couples uses the loose padding scale (24/32/48). Go uses the tight scale (12/16/24).</div></li>
+          <li><i>02</i><div><b>Hero treatment.</b> Couples = floating hearts + soft type. Go = destination photography above the same gradient card.</div></li>
+          <li><i>03</i><div><b>Imagery.</b> Couples = sparse, partner-uploaded photos as memory. Go = stock destination photography in results &amp; trip detail.</div></li>
+          <li><i>04</i><div><b>Information per screen.</b> Couples = one decision. Go = a flow with optional shortcuts.</div></li>
+          <li><i>05</i><div><b>Voice register.</b> Couples = thoughtful friend. Go = knowledgeable friend. Same person, different mood.</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Voice split, in lockstep</h3>
+    <p class="lede">Same writer, different room. Both products avoid the BRAND.md banned phrases. The split is in cadence, not vocabulary.</p>
+    <div class="voice-cols">
+      <div class="voice-col">
+        <h4>Couples (calm)</h4>
+        <h5>Cadence</h5>
+        <p>Short sentences. Specific over generic. Names the moment.</p>
+        <h5>Examples</h5>
+        <p>&ldquo;Your story starts here.&rdquo;</p>
+        <p>&ldquo;So we can quietly remember it for you.&rdquo;</p>
+        <p>&ldquo;The space for the two of you.&rdquo;</p>
+      </div>
+      <div class="voice-col">
+        <h4>Go (efficient)</h4>
+        <h5>Cadence</h5>
+        <p>Verbs first. Number of seconds, number of options. Useful, not warm.</p>
+        <h5>Examples</h5>
+        <p>&ldquo;Skip the planning. A trip in 30 seconds.&rdquo;</p>
+        <p>&ldquo;Three ideas, from BNE, ~$250/day.&rdquo;</p>
+        <p>&ldquo;Cheapest window: 2 June → 9 June.&rdquo;</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== SECTION 2 — FOUNDATION ============== -->
+  <section id="foundation">
+    <h2><span class="num">Section 2 — foundation</span>The <em>tokens</em></h2>
+    <p class="lede">Single source of truth. Couples and Go both consume these values. Names are stable; values can change in one place.</p>
+
+    <h3>Color · the pink scale</h3>
+    <p>One ramp covers primary, hover, active, focus rings, tints, and the four-tone scale that today is rendered as four different blues on Go. The 500 stop is the brand primary; outline ring shown on it.</p>
+    <div class="ramp">
+      <div class="swatch light" style="background:#FFF2F5;">pink-50<b>#FFF2F5</b></div>
+      <div class="swatch light" style="background:#FFE0E8;">pink-100<b>#FFE0E8</b></div>
+      <div class="swatch light" style="background:#FCBED0;">pink-200<b>#FCBED0</b></div>
+      <div class="swatch dark"  style="background:#F89BB6;">pink-300<b>#F89BB6</b></div>
+      <div class="swatch dark"  style="background:#F4719A;">pink-400<b>#F4719A</b></div>
+      <div class="swatch dark is-primary" style="background:#F43F6A;">pink-500<b>#F43F6A</b></div>
+      <div class="swatch dark" style="background:#D72955;">pink-600<b>#D72955</b></div>
+    </div>
+
+    <h4>Surfaces &amp; ink</h4>
+    <div class="stack">
+      <div class="stk light" style="background:#FDF0F0;">cream<b>#FDF0F0</b></div>
+      <div class="stk light" style="background:#FFF7F7;">cream-2<b>#FFF7F7</b></div>
+      <div class="stk light" style="background:#FFFFFF; border:1px solid var(--hairline);">white<b>#FFFFFF</b></div>
+      <div class="stk dark" style="background:#1A1A1A;">ink<b>#1A1A1A</b></div>
+    </div>
+    <p style="margin-top:14px; color:var(--ink-soft); font-size:14.5px;"><b style="color:var(--ink)">Ink scale:</b> <code>#1A1A1A</code> primary · <code>#6B6B6B</code> soft · <code>#999999</code> faint. <b style="color:var(--ink); margin-left:10px;">Banned:</b> teal, pure black, any grey outside the ink scale.</p>
+
+    <h3>Type · Fraunces + system sans + JetBrains Mono</h3>
+    <p>Three families. Fraunces for any voice that&rsquo;s emotional or aspirational. System sans for everything functional. Mono for eyebrows, labels, codes, timestamps, technical metadata.</p>
+
+    <div class="type-stack">
+      <div class="type-row">
+        <div class="meta"><b>Display</b>Fraunces 600 · 44/48</div>
+        <div class="sample"><span class="t-display">Your next trip <em>together.</em></span></div>
+      </div>
+      <div class="type-row">
+        <div class="meta"><b>H1</b>Fraunces 600 · 32/36</div>
+        <div class="sample"><span class="t-h1">Where to <em>next?</em></span></div>
+      </div>
+      <div class="type-row">
+        <div class="meta"><b>H2</b>Fraunces 600 · 22/26</div>
+        <div class="sample"><span class="t-h2">Our <em>little corner</em></span></div>
+      </div>
+      <div class="type-row">
+        <div class="meta"><b>Body</b>System sans 400 · 16/24</div>
+        <div class="sample"><span class="t-body">A place for the bits of you and me that don&rsquo;t need a calendar invite.</span></div>
+      </div>
+      <div class="type-row">
+        <div class="meta"><b>Body soft</b>System sans 400 · 15/22 · ink-soft</div>
+        <div class="sample"><span class="t-body-soft">Pick a trip type, then choose a destination or a route.</span></div>
+      </div>
+      <div class="type-row">
+        <div class="meta"><b>Label</b>System sans 600 · 11 · uppercase · letter-spacing 0.08em</div>
+        <div class="sample"><span class="t-label">Next visit</span></div>
+      </div>
+      <div class="type-row">
+        <div class="meta"><b>Button</b>System sans 600 · 15/1</div>
+        <div class="sample"><span class="t-button">Save to Next Visit</span></div>
+      </div>
+      <div class="type-row">
+        <div class="meta"><b>Mono</b>JetBrains Mono 400 · 12</div>
+        <div class="sample"><span class="t-mono">BNE → CNX · 9–10h direct · ~A$1,750/person</span></div>
+      </div>
+    </div>
+
+    <h4>Italic accent rule</h4>
+    <p style="max-width:660px;">The italic-Fraunces accent word at the <em>end</em> of a sentence-case headline is the brand&rsquo;s strongest signature device. <b>Codified:</b> 1–3 words, always at the end of the line, always pink, never on body text or button labels, never repeated within a single screen.</p>
+
+    <h3>Spacing · one scale</h3>
+    <p>Lifted directly from BRAND.md. Couples leans on the right half, Go on the left half, but every value is on the scale.</p>
+    <div class="scale-bar">
+      <div class="bar" data-val="4"  style="width:6px; height:8%"></div>
+      <div class="gap"></div>
+      <div class="bar" data-val="8"  style="width:6px; height:16%"></div>
+      <div class="gap"></div>
+      <div class="bar" data-val="12" style="width:8px; height:24%"></div>
+      <div class="gap"></div>
+      <div class="bar" data-val="16" style="width:10px; height:32%"></div>
+      <div class="gap"></div>
+      <div class="bar" data-val="24" style="width:14px; height:48%"></div>
+      <div class="gap"></div>
+      <div class="bar" data-val="32" style="width:16px; height:64%"></div>
+      <div class="gap"></div>
+      <div class="bar" data-val="48" style="width:20px; height:80%"></div>
+      <div class="gap"></div>
+      <div class="bar" data-val="64" style="width:24px; height:95%; background:var(--pink-400)"></div>
+      <div class="gap"></div>
+      <div class="bar" data-val="96" style="width:28px; height:100%; background:var(--pink-500)"></div>
+    </div>
+
+    <h3>Radius, shadow, motion</h3>
+    <table class="matrix">
+      <thead><tr><th>Token</th><th>Value</th><th>Used for</th></tr></thead>
+      <tbody>
+        <tr><td class="k">r-xs</td><td class="v">6px</td><td>Tag chips, small badges</td></tr>
+        <tr><td class="k">r-sm</td><td class="v">10px</td><td>Inputs, small icon tiles</td></tr>
+        <tr><td class="k">r-md</td><td class="v">14px</td><td><b>Default</b> · cards, modals, affiliate cards</td></tr>
+        <tr><td class="k">r-lg</td><td class="v">20px</td><td>Hero cards, countdown, save-to-couples card</td></tr>
+        <tr><td class="k">r-pill</td><td class="v">9999px</td><td>Buttons, segmented control, avatars</td></tr>
+        <tr><td class="k">shadow-sm</td><td class="v">0 1px 2px rgba(244,63,106,.06), 0 4px 12px rgba(244,63,106,.05)</td><td>Default cards</td></tr>
+        <tr><td class="k">shadow-md</td><td class="v">0 4px 12px rgba(244,63,106,.08), 0 12px 32px rgba(244,63,106,.06)</td><td>Hover lift on interactive cards</td></tr>
+        <tr><td class="k">shadow-lg</td><td class="v">0 8px 24px rgba(244,63,106,.10), 0 32px 64px rgba(244,63,106,.08)</td><td>Modals, hero countdown, save card</td></tr>
+        <tr><td class="k">duration-fast</td><td class="v">150ms</td><td>Hovers, button states</td></tr>
+        <tr><td class="k">duration-base</td><td class="v">250ms</td><td>Default transitions</td></tr>
+        <tr><td class="k">duration-slow</td><td class="v">400ms</td><td>Page transitions, hero choreography</td></tr>
+        <tr><td class="k">tap</td><td class="v">scale(0.97)</td><td>All interactive touch targets</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== SECTION 3 — DENSITY ============== -->
+  <section id="density">
+    <h2><span class="num">Section 3 — density</span>The <em>two variants</em>, with numbers</h2>
+    <p class="lede">Density is the single biggest expression of the product split. Both products use the spacing scale; they pick different stops.</p>
+
+    <table class="matrix">
+      <thead>
+        <tr><th>Token</th><th>Couples (calm)</th><th>Go (efficient)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="k">Page padding (mobile)</td><td class="v">24 → 32</td><td class="v">16 → 20</td></tr>
+        <tr><td class="k">Card padding</td><td class="v">24</td><td class="v">16</td></tr>
+        <tr><td class="k">Section gap (vertical)</td><td class="v">48 → 64</td><td class="v">24 → 32</td></tr>
+        <tr><td class="k">Between sibling cards</td><td class="v">16</td><td class="v">12</td></tr>
+        <tr><td class="k">H1 → body gap</td><td class="v">16</td><td class="v">8</td></tr>
+        <tr><td class="k">Decisions per screen (max)</td><td class="v">1</td><td class="v">3</td></tr>
+        <tr><td class="k">CTAs per screen (max)</td><td class="v">1 primary</td><td class="v">1 primary + 1 AI</td></tr>
+        <tr><td class="k">Hero image presence</td><td class="v">Optional (memory)</td><td class="v">Required (destination)</td></tr>
+        <tr><td class="k">Floating hearts on hero</td><td class="v">Yes (low opacity)</td><td class="v">No</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:14px; color:var(--ink-soft); font-size:14.5px;">Every other token (color, type, radius, shadow, icon weight, button anatomy) is shared and identical.</p>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== SECTION 4 — ICONOGRAPHY ============== -->
+  <section id="icons">
+    <h2><span class="num">Section 4 — iconography</span>Phosphor, <em>regular weight</em></h2>
+    <p class="lede">Per your call: warm not corporate. Phosphor at regular weight is the right pick — friendlier than Lucide, more humble than Heroicons. Stroke is round-ended, terminals are gentle, the geometry is soft. 💕 stays as the brand glyph; the rest of the product uses Phosphor.</p>
+
+    <h4>Sampling — the icons we&rsquo;ll need most</h4>
+    <div class="icon-grid">
+      <div class="ic"><i class="ph ph-house"></i><span>house</span></div>
+      <div class="ic"><i class="ph ph-heart"></i><span>heart</span></div>
+      <div class="ic"><i class="ph ph-camera"></i><span>camera</span></div>
+      <div class="ic"><i class="ph ph-musical-note"></i><span>music</span></div>
+      <div class="ic"><i class="ph ph-airplane-tilt"></i><span>flight</span></div>
+      <div class="ic"><i class="ph ph-map-pin"></i><span>place</span></div>
+      <div class="ic"><i class="ph ph-calendar-blank"></i><span>date</span></div>
+      <div class="ic"><i class="ph ph-sparkle"></i><span>ai</span></div>
+      <div class="ic"><i class="ph ph-list-checks"></i><span>list</span></div>
+      <div class="ic"><i class="ph ph-bookmark-simple"></i><span>save</span></div>
+      <div class="ic"><i class="ph ph-paper-plane-tilt"></i><span>share</span></div>
+      <div class="ic"><i class="ph ph-plus"></i><span>add</span></div>
+      <div class="ic"><i class="ph ph-bell"></i><span>notify</span></div>
+      <div class="ic"><i class="ph ph-shield-check"></i><span>privacy</span></div>
+      <div class="ic"><i class="ph ph-suitcase-rolling"></i><span>trip</span></div>
+      <div class="ic"><i class="ph ph-globe-hemisphere-east"></i><span>dream</span></div>
+    </div>
+
+    <h4>Usage rules</h4>
+    <table class="matrix">
+      <thead><tr><th>Context</th><th>Weight</th><th>Size</th><th>Color</th></tr></thead>
+      <tbody>
+        <tr><td class="k">List rows, settings rows, button affordances</td><td class="v">regular</td><td class="v">18–20px</td><td class="v">ink or pink-500</td></tr>
+        <tr><td class="k">Category tiles (eg Us page)</td><td class="v">duotone</td><td class="v">28–32px</td><td class="v">pink-500 + pink-200</td></tr>
+        <tr><td class="k">Inline with text labels</td><td class="v">regular</td><td class="v">14px</td><td class="v">inherit</td></tr>
+        <tr><td class="k">The brand glyph 💕</td><td class="v">emoji</td><td class="v">contextual</td><td class="v">native</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:14px;">Emoji elsewhere is <b>retired</b>. The eleven list emojis, the six notification-row emojis, the four quiz emojis — all of them move to a single Phosphor icon. Result: one visual language for chrome, 💕 reserved as the heart of the brand.</p>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== SECTION 5 — PRIMITIVES ============== -->
+  <section id="primitives">
+    <h2><span class="num">Section 5 — primitives</span>The <em>shared</em> components</h2>
+    <p class="lede">Identical anatomy across both products. Density differs, the part doesn&rsquo;t. Each primitive shows a couples render and a go render side by side so you can see the variance is in spacing, not structure.</p>
+
+    <!-- BUTTON -->
+    <div class="prim">
+      <div class="prim-head"><span class="id">P-01</span><h3>Button</h3></div>
+      <p class="use">Three variants total: primary (filled pink, white text), secondary (white with pink-tint border), tertiary (text-only). Plus one specialized AI variant for serendipitous &ldquo;surprise me&rdquo; CTAs. All share the same pill shape and tap state.</p>
+
+      <div class="demo-row">
+        <div class="demo couples">
+          <span class="ctx-label">couples</span>
+          <button class="btn btn-primary btn-block"><i class="ph ph-paper-plane-tilt"></i> Save to Next Visit</button>
+          <button class="btn btn-secondary btn-block">Skip for now</button>
+          <button class="btn btn-tertiary">Back</button>
+        </div>
+        <div class="demo go">
+          <span class="ctx-label">go</span>
+          <button class="btn btn-primary btn-block">Build my trip <i class="ph ph-arrow-right"></i></button>
+          <button class="btn btn-ai btn-block"><i class="ph ph-sparkle"></i> Find us somewhere</button>
+          <button class="btn btn-secondary btn-block">Back</button>
+        </div>
+      </div>
+
+      <div class="spec">
+        <b>Anatomy</b> · pill <span class="k">r-pill</span> · padding <span class="k">14×20</span> (couples), <span class="k">12×18</span> (go) · weight <span class="k">600</span> · size <span class="k">15</span> · tap <span class="k">scale(0.97)</span><br>
+        <b>Primary</b> bg <span class="k">pink-500</span> · text <span class="k">white</span> · shadow <span class="k">0 6px 14px rgba(244,63,106,0.25)</span> · hover bg <span class="k">pink-600</span><br>
+        <b>Secondary</b> bg <span class="k">white</span> · border <span class="k">var(--border)</span> · text <span class="k">ink</span> · hover border <span class="k">var(--border-hover)</span><br>
+        <b>Tertiary</b> bg <span class="k">transparent</span> · text <span class="k">pink-500</span><br>
+        <b>AI</b> bg <span class="k">linear-gradient(135deg, pink-50, cream)</span> · border <span class="k">1px dashed border-active</span> · text <span class="k">pink-600</span> · used only for serendipitous suggestions
+      </div>
+    </div>
+
+    <!-- CARD -->
+    <div class="prim">
+      <div class="prim-head"><span class="id">P-02</span><h3>Card</h3></div>
+      <p class="use">The atom of the entire product. White on cream, pink-tinted shadow, hairline pink border at 0.12. Padding flexes by density; everything else stays.</p>
+
+      <div class="demo-row">
+        <div class="demo couples">
+          <span class="ctx-label">couples · padding 24</span>
+          <div class="card" style="padding:24px;">
+            <div class="eyebrow">Our anniversary</div>
+            <h6>3 January</h6>
+            <p class="desc">Shared with your partner — shows in the calendar.</p>
+          </div>
+        </div>
+        <div class="demo go">
+          <span class="ctx-label">go · padding 16</span>
+          <div class="card" style="padding:16px;">
+            <div class="eyebrow">Flight</div>
+            <h6>BNE → HAN</h6>
+            <p class="desc">14 July · 1 traveller · one-way · on Skyscanner</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec">
+        <b>Background</b> <span class="k">white</span> · <b>Border</b> <span class="k">1px solid var(--border)</span> · <b>Radius</b> <span class="k">r-md (14px)</span><br>
+        <b>Shadow</b> <span class="k">shadow-sm</span> default · <span class="k">shadow-md</span> hover (interactive cards) · <span class="k">shadow-lg</span> for hero/modal<br>
+        <b>Padding</b> <span class="k">24</span> couples · <span class="k">16</span> go · <b>Hover</b> border → <span class="k">border-hover</span>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="prim">
+      <div class="prim-head"><span class="id">P-03</span><h3>Input</h3></div>
+      <p class="use">One input style. Replaces today&rsquo;s mix of pink-bordered, no-border-grey-fill, and thick-pink-border inputs. The focused state owns the accent.</p>
+
+      <div class="demo-row">
+        <div class="demo couples">
+          <span class="ctx-label">couples</span>
+          <div class="field">
+            <label>Your name</label>
+            <input class="input" placeholder="Just a first name is fine" />
+          </div>
+        </div>
+        <div class="demo go">
+          <span class="ctx-label">go</span>
+          <div class="field">
+            <label>Departure airport</label>
+            <input class="input" placeholder="BNE, MEL, SYD…" />
+          </div>
+        </div>
+      </div>
+
+      <div class="spec">
+        <b>Resting</b> bg <span class="k">white</span> · border <span class="k">var(--border)</span> · radius <span class="k">r-sm (10px)</span> · padding <span class="k">12×14</span><br>
+        <b>Focus</b> border <span class="k">pink-500</span> · ring <span class="k">0 0 0 3px rgba(244,63,106,0.12)</span><br>
+        <b>Placeholder</b> <span class="k">ink-faint</span> · <b>Disabled</b> bg <span class="k">cream</span>, opacity 0.6
+      </div>
+    </div>
+
+    <!-- CHIPS -->
+    <div class="prim">
+      <div class="prim-head"><span class="id">P-04</span><h3>Chip</h3></div>
+      <p class="use">Replaces today&rsquo;s light-blue pills on Go results and the budget/weather chip selectors. Two states: resting and active. Optional pink icon.</p>
+
+      <div class="demo-row">
+        <div class="demo couples">
+          <span class="ctx-label">couples</span>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="chip"><i class="ph ph-heart"></i> Romantic evening</span>
+            <span class="chip">Outdoor adventure</span>
+            <span class="chip is-active">Foodie experience</span>
+          </div>
+        </div>
+        <div class="demo go">
+          <span class="ctx-label">go</span>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="chip">Food &amp; drink</span>
+            <span class="chip">Culture</span>
+            <span class="chip is-active">Outdoors</span>
+            <span class="chip">Nightlife</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec">
+        <b>Resting</b> bg <span class="k">white</span> · border <span class="k">var(--border)</span> · text <span class="k">ink</span> · padding <span class="k">6×12</span> · radius <span class="k">r-pill</span><br>
+        <b>Active</b> bg <span class="k">pink-50</span> · border <span class="k">pink-300</span> · text <span class="k">pink-600</span>
+      </div>
+    </div>
+
+    <!-- SEGMENTED -->
+    <div class="prim">
+      <div class="prim-head"><span class="id">P-05</span><h3>Segmented control</h3></div>
+      <p class="use">Replaces the black segmented control on Memories index and the matching tabs on Go trip detail. Pink-tint active state.</p>
+
+      <div class="demo-row">
+        <div class="demo couples">
+          <span class="ctx-label">couples · Memories</span>
+          <div class="segmented">
+            <span class="seg is-active"><i class="ph ph-chart-bar"></i> Timeline</span>
+            <span class="seg"><i class="ph ph-grid-four"></i> Gallery</span>
+            <span class="seg"><i class="ph ph-map-pin"></i> Map</span>
+          </div>
+        </div>
+        <div class="demo go">
+          <span class="ctx-label">go · Trip detail</span>
+          <div class="segmented">
+            <span class="seg is-active">Flights</span>
+            <span class="seg">Stay</span>
+            <span class="seg">Things to do</span>
+            <span class="seg">Prep</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec">
+        <b>Track</b> bg <span class="k">cream</span> · border <span class="k">var(--border)</span> · radius <span class="k">r-pill</span> · padding <span class="k">4</span><br>
+        <b>Inactive</b> text <span class="k">ink-soft</span> · <b>Active</b> bg <span class="k">white</span> · text <span class="k">pink-500</span> · shadow <span class="k">0 2px 6px rgba(244,63,106,0.10)</span>
+      </div>
+    </div>
+
+    <!-- AFFILIATE -->
+    <div class="prim">
+      <div class="prim-head"><span class="id">P-06</span><h3>Affiliate card</h3></div>
+      <p class="use">Replaces the seven full-bleed color cards on Go (Booking, Klook, Viator, GetYourGuide, DiscoverCars, Airalo, SafetyWing). Neutral surface; partner brand color survives in the small monogram tile only.</p>
+
+      <div class="demo-row">
+        <div class="demo go" style="background:var(--cream); padding:24px;">
+          <span class="ctx-label">go · stays</span>
+          <a class="affil"><span class="mono" style="background:#003580;">B.</span><span class="meta"><b>Booking.com</b><span>Hotels in Chiang Mai</span></span><i class="ph ph-arrow-up-right arrow"></i></a>
+          <a class="affil"><span class="mono" style="background:#FF5A5F;">A</span><span class="meta"><b>Airbnb</b><span>Stays in Chiang Mai</span></span><i class="ph ph-arrow-up-right arrow"></i></a>
+        </div>
+        <div class="demo go" style="background:var(--cream); padding:24px;">
+          <span class="ctx-label">go · things to do &amp; prep</span>
+          <a class="affil"><span class="mono" style="background:#C02828;">K</span><span class="meta"><b>Klook</b><span>Tours &amp; activities in Chiang Mai</span></span><i class="ph ph-arrow-up-right arrow"></i></a>
+          <a class="affil"><span class="mono" style="background:#3D2EB8;">A</span><span class="meta"><b>Airalo</b><span>eSIM data plan for Thailand</span></span><i class="ph ph-arrow-up-right arrow"></i></a>
+          <a class="affil"><span class="mono" style="background:#1F5E3C;">S</span><span class="meta"><b>SafetyWing</b><span>Travel insurance for the trip</span></span><i class="ph ph-arrow-up-right arrow"></i></a>
+        </div>
+      </div>
+
+      <div class="spec">
+        <b>Card</b> identical to P-02 · padding <span class="k">16</span> · interactive (hover lift)<br>
+        <b>Monogram</b> <span class="k">36×36</span> · radius <span class="k">r-sm</span> · partner brand color · partner initial in white <span class="k">700</span><br>
+        <b>Result</b> seven full-bleed colored cards → seven neutral cards with seven small brand stamps. Identity preserved, calm restored.
+      </div>
+    </div>
+
+    <!-- AI CTA recap is in the button row above. -->
+
+    <!-- COUNTDOWN -->
+    <div class="prim">
+      <div class="prim-head"><span class="id">P-07</span><h3>The countdown</h3></div>
+      <p class="use">One component. Used in both products. The only variance is what sits above the gradient card. Couples gets floating hearts; Go gets a destination photo strip. The card itself never changes.</p>
+
+      <div class="demo-row">
+        <div class="demo couples" style="padding:18px;">
+          <span class="ctx-label">couples · Home</span>
+          <div class="countdown">
+            <span class="hearts">💕</span>
+            <div class="eyebrow">Next visit</div>
+            <div class="place">Chiang Mai, <em>Thailand</em></div>
+            <div class="meta">2 Jun → 9 Jun · 7 nights</div>
+            <div class="numeral">19<span class="unit">days to go</span></div>
+            <div class="actions">
+              <button class="btn-ghost"><i class="ph ph-list-bullets"></i> Trip details</button>
+              <button class="btn-ghost"><i class="ph ph-paper-plane-tilt"></i> Share</button>
+            </div>
+          </div>
+        </div>
+        <div class="demo go" style="padding:18px;">
+          <span class="ctx-label">go · You&rsquo;re all set</span>
+          <div class="countdown go-variant">
+            <div class="hero-img">[ destination photo · chiang mai ]</div>
+            <div class="eyebrow">Your trip</div>
+            <div class="place">Chiang Mai, <em>Thailand</em></div>
+            <div class="meta">2 Jun → 9 Jun · 7 nights · 1 traveller</div>
+            <div class="numeral">19<span class="unit">days to go</span></div>
+            <div class="actions">
+              <button class="btn-ghost"><i class="ph ph-copy"></i> Copy as text</button>
+              <button class="btn-ghost"><i class="ph ph-paper-plane-tilt"></i> Share link</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec">
+        <b>Card</b> bg <span class="k">linear-gradient(135deg, pink-500, pink-400)</span> · radius <span class="k">r-lg (20)</span> · padding <span class="k">28</span> · shadow <span class="k">0 12px 32px rgba(244,63,106,0.20)</span><br>
+        <b>Eyebrow</b> mono 11 uppercase white-75 · <b>Place</b> Fraunces 600 26 · italic country accent<br>
+        <b>Numeral</b> Fraunces 600 <span class="k">84</span> · italic &ldquo;days to go&rdquo; unit at 18 alongside<br>
+        <b>Ghost buttons</b> bg <span class="k">rgba(255,255,255,0.18)</span> · backdrop-blur <span class="k">8</span> · border <span class="k">rgba(255,255,255,0.20)</span><br>
+        <b>Variant</b> couples adds floating hearts emoji top-right at <span class="k">opacity 0.35</span> · go prepends a 140px destination photo strip via negative margin
+      </div>
+    </div>
+
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== SECTION 6 — CROSS-PRODUCT ============== -->
+  <section id="cohesion">
+    <h2><span class="num">Section 6 — choreography</span>Where the products <em>meet</em></h2>
+    <p class="lede">Three contact points: the wordmark, the handoff card on Go, and the moment a trip arrives on couples Home. All three become signature.</p>
+
+    <h3>The wordmark</h3>
+    <p>One mark, identically rendered in both products. Couples uses it top-right (above bottom-nav), Go uses it top-left (in the chrome). Same typography, same color, same glyph.</p>
+
+    <div class="demo-row" style="margin-top:16px;">
+      <div class="demo couples" style="align-items:center; justify-content:center; min-height:120px;">
+        <span class="ctx-label">couples · top-right</span>
+        <div class="wordmark"><span>Next</span><em>Visit</em><span class="glyph">💕</span></div>
+      </div>
+      <div class="demo go" style="align-items:center; justify-content:center; min-height:120px;">
+        <span class="ctx-label">go · top-left</span>
+        <div class="wordmark"><span>Next</span><em>Visit</em><span class="glyph">💕</span></div>
+      </div>
+    </div>
+    <div class="spec" style="margin-top:14px;">
+      <b>Mark</b> Fraunces 600 · sentence case · second word italic pink-500 · 💕 glyph trailing at 14px<br>
+      <b>Position</b> couples top-right, go top-left, both 16–20px from edge · same on mobile and desktop
+    </div>
+
+    <h3>The handoff card</h3>
+    <p>Lives at the end of Go&rsquo;s trip detail. The wording stays exactly as today (it&rsquo;s already correct). The visual moves to the unified hero radius and surface.</p>
+
+    <div class="demo-row" style="margin-top:16px;">
+      <div class="demo go" style="padding:24px;">
+        <span class="ctx-label">go · end of trip detail</span>
+        <div class="handoff">
+          <div class="eyebrow">Don&rsquo;t lose this trip</div>
+          <h6>Plan it <em>together →</em></h6>
+          <p>Save to your shared Next Visit space — countdown the days, share notes and photos, keep memories in one place.</p>
+          <button class="btn-on-pink"><span class="glyph" style="font-size:16px;">💕</span> Save to Next Visit</button>
+          <div class="footnote">Free · Just an email · Built for couples</div>
+        </div>
+      </div>
+      <div class="demo couples" style="padding:24px; justify-content:center;">
+        <span class="ctx-label">couples · the arrival moment (preview)</span>
+        <div style="background: var(--white); border:1px solid var(--border); border-radius: var(--r-md); padding: 16px; box-shadow: var(--shadow-sm);">
+          <div class="eyebrow" style="font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--pink-500); font-weight:600; margin-bottom:8px;">Just arrived from Go</div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div style="width:48px; height:48px; border-radius:var(--r-sm); background: repeating-linear-gradient(135deg, var(--pink-100) 0 6px, var(--pink-50) 6px 12px); flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div style="font-weight:600; font-size:15px;">Chiang Mai, Thailand</div>
+              <div style="color:var(--ink-soft); font-size:13px;">2 Jun → 9 Jun · 7 nights</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-block" style="margin-top:14px;">Open the trip <i class="ph ph-arrow-right"></i></button>
+          <p style="color:var(--ink-faint); font-size:12px; text-align:center; margin-top:10px;">Below this card, your countdown updates to 19 days.</p>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top:14px; color:var(--ink-soft); font-size:14.5px;">The full 3–4 frame choreography of the save → arrival sequence ships with the mockups in step 3.</p>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== SECTION 7 — BRAND.MD ============== -->
+  <section id="brand-md">
+    <h2><span class="num">Section 7 — BRAND.md</span>Updated <em>source of truth</em></h2>
+    <p class="lede">Proposed replacement for the current BRAND.md. Same structure, new sections for the two-variant principle, the italic-accent rule, the icon system, and the handoff. Banned/preferred phrases lift unchanged.</p>
+
+    <div class="markdown-block">
+<span class="c"># Next Visit · BRAND.md (v2)</span>
+
+<span class="c">## WHAT NEXT VISIT IS</span>
+A relationship company with two products: <span class="v">Next Visit</span> (couples app) and <span class="v">Go</span> (trip planner).
+One brand. Two voices. Shared primitives.
+
+<span class="c">## THE TWO PRODUCTS</span>
+
+<span class="c">### Next Visit (couples app) — next-visit.app</span>
+- <span class="k">Job</span>: hold the relationship between two people.
+- <span class="k">Tone</span>: calm, intentional, like a thoughtful friend who&rsquo;s good at romance.
+- <span class="k">Density</span>: generous. One decision per screen. Padding scale leans 24/32/48.
+
+<span class="c">### Go (trip planner) — go.next-visit.app</span>
+- <span class="k">Job</span>: turn travel inspiration into bookings, fast.
+- <span class="k">Tone</span>: efficient, like a knowledgeable friend who books your trip in 30 seconds.
+- <span class="k">Density</span>: tight. Multiple decisions per screen are okay. Padding scale leans 12/16/24.
+
+<span class="c">## THE TWO-VARIANT PRINCIPLE</span>
+Shared (never varies): <span class="v">color, type, primitives, icon family, the countdown</span>.
+Variant (flexes per product): <span class="v">density, hero treatment, imagery, info per screen, voice register</span>.
+
+<span class="c">## BANNED PHRASES</span>
+&ldquo;Sign up&rdquo;, &ldquo;Get started&rdquo;, &ldquo;Join now&rdquo;, &ldquo;Book now&rdquo;, &ldquo;Lock in dates&rdquo;,
+&ldquo;Reserve your spot&rdquo;, &ldquo;Limited time&rdquo;, &ldquo;Don&rsquo;t miss out&rdquo;, &ldquo;Hurry&rdquo;,
+&ldquo;Long distance&rdquo;, &ldquo;miles apart&rdquo;, &ldquo;until they arrive&rdquo;,
+&ldquo;Visit&rdquo; as a verb (use &ldquo;trip&rdquo; or &ldquo;time together&rdquo;),
+&ldquo;Users&rdquo; (use &ldquo;couples&rdquo;), &ldquo;Premium&rdquo;, &ldquo;upgrade&rdquo;, &ldquo;unlock features&rdquo;.
+
+<span class="c">## PREFERRED PHRASES</span>
+&ldquo;The space for the two of you&rdquo;, &ldquo;Your next trip together&rdquo;, &ldquo;Time together&rdquo;,
+&ldquo;Open Next Visit&rdquo;, &ldquo;Create our space&rdquo;, &ldquo;Join my partner&rdquo;,
+&ldquo;Save to Next Visit&rdquo;, &ldquo;Plan it together&rdquo;.
+
+<span class="c">## COLOR</span>
+<span class="c"># Single source ramp — same in both products</span>
+<span class="k">--pink-50</span>:  <span class="v">#FFF2F5</span>
+<span class="k">--pink-100</span>: <span class="v">#FFE0E8</span>
+<span class="k">--pink-200</span>: <span class="v">#FCBED0</span>
+<span class="k">--pink-300</span>: <span class="v">#F89BB6</span>
+<span class="k">--pink-400</span>: <span class="v">#F4719A</span>  <span class="c"># soft primary, gradients</span>
+<span class="k">--pink-500</span>: <span class="v">#F43F6A</span>  <span class="c"># PRIMARY</span>
+<span class="k">--pink-600</span>: <span class="v">#D72955</span>  <span class="c"># hover, active</span>
+<span class="k">--pink-700</span>: <span class="v">#A8203F</span>  <span class="c"># text on pale pink, focus rings deep</span>
+
+<span class="k">--cream</span>:    <span class="v">#FDF0F0</span>  <span class="c"># default page surface</span>
+<span class="k">--cream-2</span>:  <span class="v">#FFF7F7</span>  <span class="c"># subtle elevation</span>
+<span class="k">--white</span>:    <span class="v">#FFFFFF</span>  <span class="c"># cards, modals</span>
+
+<span class="k">--ink</span>:        <span class="v">#1A1A1A</span>  <span class="c"># primary text</span>
+<span class="k">--ink-soft</span>:   <span class="v">#6B6B6B</span>  <span class="c"># secondary text</span>
+<span class="k">--ink-faint</span>:  <span class="v">#999999</span>  <span class="c"># tertiary text, placeholders</span>
+
+<span class="k">--border</span>:        <span class="v">rgba(244,63,106,0.12)</span>
+<span class="k">--border-hover</span>:  <span class="v">rgba(244,63,106,0.30)</span>
+<span class="k">--border-active</span>: <span class="v">rgba(244,63,106,0.50)</span>
+
+<strong>BANNED</strong>: teal, pure black, any grey outside the ink scale, blue as a primary surface.
+Partner brand colors are allowed <strong>only</strong> inside affiliate monograms (36×36 max).
+
+<span class="c">## TYPOGRAPHY</span>
+- <span class="k">Headlines</span>: Fraunces serif, 600 (occasionally 700), sentence case.
+- <span class="k">Italic accent</span>: 1–3 words, end of headline, always pink-500, never on body or buttons.
+- <span class="k">Body</span>: system sans, 400.
+- <span class="k">Buttons</span>: system sans, 600.
+- <span class="k">Labels &amp; metadata</span>: JetBrains Mono, 600, uppercase, letter-spacing 0.06–0.08em.
+- <strong>Never</strong> all-caps body. Never decorative serif on body.
+
+<span class="c">## ICONOGRAPHY</span>
+- <span class="k">Library</span>: Phosphor.
+- <span class="k">Default weight</span>: regular (chrome, buttons, list rows).
+- <span class="k">Duotone</span>: category tiles only, pink-500 + pink-200.
+- <span class="k">Brand glyph</span>: 💕 (only emoji in the product).
+- Emoji-as-icon is retired.
+
+<span class="c">## SPACING</span>
+Scale: <span class="v">4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96</span>.
+- Couples leans on 24, 32, 48, 64.
+- Go leans on 12, 16, 24, 32.
+
+<span class="c">## BORDER RADIUS</span>
+<span class="v">6 / 10 / 14 (default) / 20 (hero) / 9999 (pill)</span>.
+
+<span class="c">## SHADOWS</span>
+Always pink-tinted, never pure black.
+- <span class="k">shadow-sm</span> default cards
+- <span class="k">shadow-md</span> hover lift
+- <span class="k">shadow-lg</span> modals, hero, save-to-couples
+
+<span class="c">## MOTION</span>
+- <span class="v">150ms</span> hovers, button states
+- <span class="v">250ms</span> default transitions
+- <span class="v">400ms</span> page transitions, hero choreography
+- Tap state <span class="v">scale(0.97)</span>. Respect <span class="v">prefers-reduced-motion</span>.
+
+<span class="c">## THE COUNTDOWN (signature component)</span>
+One component, used identically in both products. Pink-500 → pink-400 gradient, radius 20,
+Fraunces numeral, italic &ldquo;days to go&rdquo;, two ghost buttons. Couples adds floating 💕.
+Go prepends a destination photo strip.
+
+<span class="c">## THE WORDMARK</span>
+Fraunces 600 · sentence case · second word italic pink-500 · 💕 glyph trailing.
+Couples top-right, go top-left, both ~16–20px from edge.
+
+<span class="c">## THE HANDOFF</span>
+Save to Next Visit (go → couples) is a designed moment, not a banner.
+Wording: &ldquo;Plan it together →&rdquo;.
+On arrival, couples Home shows a &ldquo;Just arrived from Go&rdquo; card above the countdown,
+then animates the countdown into place after a beat.
+
+<span class="c">## WHEN UNCLEAR</span>
+Pick what feels calmer over louder, simpler over more,
+warmer over colder, more specific over more generic.
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== SECTION 8 — ROADMAP ============== -->
+  <section id="roadmap">
+    <h2><span class="num">Section 8 — roadmap</span>What ships, in what <em>order</em></h2>
+    <p class="lede">Three tranches. Tranche one is the brand-fix; you could ship it inside a single sprint and have a product that already feels unified. Tranche two is the systematic cleanup. Tranche three is the new moments.</p>
+
+    <h3 style="color:#B91530;">Tranche 1 · the brand fix (week 1)</h3>
+    <div class="road">
+      <div class="road-card w1">
+        <h5>Replace Go primary <code>#0770E3</code> with <code>#F43F6A</code> <span class="ref">G-01</span></h5>
+        <p>One CSS variable swap. Affects all primary buttons, progress bars, step indicators, selection outlines, the trip hero. Largest single visual change.</p>
+        <div class="tags"><span class="tag">go</span><span class="tag">tokens</span><span class="tag">~1 day</span></div>
+      </div>
+      <div class="road-card w1">
+        <h5>Neutralize the seven affiliate cards on Go <span class="ref">G-02</span></h5>
+        <p>White card, hairline pink border, partner monogram in their color. Retains identifiability, kills the rainbow.</p>
+        <div class="tags"><span class="tag">go</span><span class="tag">P-06</span><span class="tag">~1 day</span></div>
+      </div>
+      <div class="road-card w1">
+        <h5>Retire the green/purple/mint accents on couples <span class="ref">C-02</span></h5>
+        <p>Music card, Quizzes card, &ldquo;with partner&rdquo; banner. All move to white-on-cream with pink accent.</p>
+        <div class="tags"><span class="tag">couples</span><span class="tag">~1 day</span></div>
+      </div>
+      <div class="road-card w1">
+        <h5>Ship the unified countdown <span class="ref">G-05 · P-07</span></h5>
+        <p>One component, both products. The most emotional moment in either product.</p>
+        <div class="tags"><span class="tag">both</span><span class="tag">P-07</span><span class="tag">~2 days</span></div>
+      </div>
+    </div>
+
+    <h3 style="color:#C26A06; margin-top:32px;">Tranche 2 · systematic cleanup (week 2–3)</h3>
+    <div class="road">
+      <div class="road-card w2">
+        <h5>Phosphor everywhere; emoji retires (except 💕) <span class="ref">C-03</span></h5>
+        <p>Lists, settings, notifications, quiz tiles, category tiles. One icon family.</p>
+        <div class="tags"><span class="tag">couples</span><span class="tag">P-04 · P-05</span></div>
+      </div>
+      <div class="road-card w2">
+        <h5>Unified wordmark across both products <span class="ref">X-01 · C-08</span></h5>
+        <p>One mark, one typography lockup, one position.</p>
+        <div class="tags"><span class="tag">both</span></div>
+      </div>
+      <div class="road-card w2">
+        <h5>Resolve the couples Home hero into a state machine <span class="ref">C-04</span></h5>
+        <p>Pre-trip (gentle empty), upcoming (countdown), arrival (handoff). Stop stacking three pink cards.</p>
+        <div class="tags"><span class="tag">couples</span><span class="tag">P-07</span></div>
+      </div>
+      <div class="road-card w2">
+        <h5>Redesign the AI suggestion button <span class="ref">G-03</span></h5>
+        <p>Lose the yellow + orange dashed border. Pink-50 → cream gradient, sparkle, dashed pink-50 border.</p>
+        <div class="tags"><span class="tag">go</span><span class="tag">P-01</span></div>
+      </div>
+      <div class="road-card w2">
+        <h5>One segmented control; one input style <span class="ref">C-05 · C-06</span></h5>
+        <p>Replaces the black active state on Memories index and the mixed input borders across couples.</p>
+        <div class="tags"><span class="tag">both</span><span class="tag">P-03 · P-05</span></div>
+      </div>
+      <div class="road-card w2">
+        <h5>Collapse the four Go blues into the single pink ramp <span class="ref">G-08</span></h5>
+        <p>Progress, pills, step badges, selection outlines all reference the same scale.</p>
+        <div class="tags"><span class="tag">go</span></div>
+      </div>
+    </div>
+
+    <h3 style="color:#4A7A3A; margin-top:32px;">Tranche 3 · the new moments (week 3–4)</h3>
+    <div class="road">
+      <div class="road-card w3">
+        <h5>Save → arrival choreography <span class="ref">X-02</span></h5>
+        <p>3–4 frame sequence: tap on Go → email collect → success → arrival on couples Home. Detailed mockup ships with step 3.</p>
+        <div class="tags"><span class="tag">both</span><span class="tag">mockup pending</span></div>
+      </div>
+      <div class="road-card w3">
+        <h5>Photos hybrid model <span class="ref">C-07</span></h5>
+        <p>Unsorted bucket + tagged sections. New territory; design from scratch in step 3.</p>
+        <div class="tags"><span class="tag">couples</span><span class="tag">mockup pending</span></div>
+      </div>
+      <div class="road-card w3">
+        <h5>Results card refinement <span class="ref">G-06</span></h5>
+        <p>Looser KPI row, single chip color, mobile-readability pass.</p>
+        <div class="tags"><span class="tag">go</span></div>
+      </div>
+      <div class="road-card w3">
+        <h5>Voice clean-up across copy <span class="ref">X-03</span></h5>
+        <p>Remove subdomain disclosures. &ldquo;Opens our planner&rdquo; or nothing.</p>
+        <div class="tags"><span class="tag">couples</span></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== CLOSER ============== -->
+  <section id="closer" class="tight">
+    <div class="closer">
+      <div class="crumb" style="margin-bottom:6px;">Next step</div>
+      <h2>Approve the system, and I&rsquo;ll move to the <em>ten mockups</em>.</h2>
+      <p>Confirm three things and I&rsquo;ll mock the screens you listed:</p>
+      <ul>
+        <li><b>01</b>Is the shared/variant split right? Anything that should move from the &ldquo;variant&rdquo; list to &ldquo;shared&rdquo; or vice versa?</li>
+        <li><b>02</b>Phosphor at regular weight — happy with that as the icon system? (I&rsquo;ll use duotone for category tiles only.)</li>
+        <li><b>03</b>The countdown component as specced — pink gradient, Fraunces 84px numeral, two ghost buttons — sign off so I lock it as the spine.</li>
+      </ul>
+      <p style="margin-top:24px;">Then I&rsquo;ll deliver: <b style="color:var(--pink-500);">ten mockups</b> — couples Home (pre-trip + post-save), couples Onboarding (three steps), Memory Detail, Add Memory, Us, Photos (new hybrid), Go landing, Go results, Save-to-Next-Visit (<i>as a 3–4 frame sequence</i> per your ask), Trip card on couples Home post-save.</p>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

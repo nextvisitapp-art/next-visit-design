@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mockups — Next Visit family</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+
+<style>
+  /* Brand tokens — single source of truth, mirrors proposal.html */
+  :root {
+    --pink-50:  #FFF2F5;
+    --pink-100: #FFE0E8;
+    --pink-200: #FCBED0;
+    --pink-300: #F89BB6;
+    --pink-400: #F4719A;
+    --pink-500: #F43F6A;
+    --pink-600: #D72955;
+    --pink-700: #A8203F;
+
+    --cream:    #FDF0F0;
+    --cream-2:  #FFF7F7;
+    --white:    #FFFFFF;
+
+    --ink:        #1A1A1A;
+    --ink-soft:   #6B6B6B;
+    --ink-faint:  #999999;
+
+    --border:        rgba(244, 63, 106, 0.12);
+    --border-hover:  rgba(244, 63, 106, 0.30);
+    --border-active: rgba(244, 63, 106, 0.50);
+    --hairline:      rgba(26, 26, 26, 0.08);
+
+    --shadow-sm: 0 1px 2px rgba(244,63,106,.06), 0 4px 12px rgba(244,63,106,.05);
+    --shadow-md: 0 4px 12px rgba(244,63,106,.08), 0 12px 32px rgba(244,63,106,.06);
+    --shadow-lg: 0 8px 24px rgba(244,63,106,.10), 0 32px 64px rgba(244,63,106,.08);
+
+    --sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: "Fraunces", Georgia, serif;
+    --mono:  "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    --r-xs: 6px;
+    --r-sm: 10px;
+    --r-md: 14px;
+    --r-lg: 20px;
+    --r-pill: 9999px;
+  }
+
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #f0eee9;
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Scoped reset for content inside iOS frames */
+  .nv * { box-sizing: border-box; }
+  .nv { font-family: var(--sans); color: var(--ink); line-height: 1.45; }
+  .nv h1, .nv h2, .nv h3, .nv h4, .nv h5, .nv p { margin: 0; }
+  .nv button { font-family: inherit; }
+
+  /* Hide scrollbars inside frames */
+  .nv ::-webkit-scrollbar { display: none; }
+  .nv { scrollbar-width: none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- React -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- Starters -->
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+
+<!-- App pieces -->
+<script type="text/babel" src="nv-atoms.jsx"></script>
+<script type="text/babel" src="nv-couples.jsx"></script>
+<script type="text/babel" src="nv-go.jsx"></script>
+<script type="text/babel" src="nv-canvas.jsx"></script>
+
+</body>
+</html>

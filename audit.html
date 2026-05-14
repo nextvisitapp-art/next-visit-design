@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Design audit — Next Visit + Go</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --pink: #F43F6A;
+    --pink-soft: #F4719A;
+    --cream: #FDF0F0;
+    --white: #FFFFFF;
+    --ink: #1A1A1A;
+    --ink-soft: #6B6B6B;
+    --ink-faint: #999999;
+    --border: rgba(244, 63, 106, 0.12);
+    --border-hover: rgba(244, 63, 106, 0.30);
+    --hairline: rgba(26, 26, 26, 0.08);
+    --shadow-sm: 0 1px 2px rgba(244, 63, 106, 0.06), 0 4px 12px rgba(244, 63, 106, 0.05);
+    --shadow-lg: 0 8px 24px rgba(244, 63, 106, 0.10), 0 32px 64px rgba(244, 63, 106, 0.08);
+
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: "Fraunces", Georgia, serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    /* Severity */
+    --sev-p0: #B91530;
+    --sev-p1: #C26A06;
+    --sev-p2: #4A7A3A;
+    --sev-p0-bg: #FCEDEF;
+    --sev-p1-bg: #FBF3E6;
+    --sev-p2-bg: #EDF4E9;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--cream);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .doc {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 64px 32px 128px;
+  }
+
+  /* Masthead */
+  .masthead {
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+  }
+  .crumb {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pink);
+  }
+  .crumb .dot { color: var(--ink-faint); margin: 0 8px; font-weight: 400; }
+  h1.title {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 52px;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin: 16px 0 12px;
+    text-wrap: pretty;
+  }
+  h1.title em { font-style: italic; color: var(--pink); font-weight: 600; }
+  .deck {
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 640px;
+    text-wrap: pretty;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 32px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .meta-row b { display: block; color: var(--ink-faint); font-weight: 600; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+
+  /* Section */
+  section { margin: 80px 0; }
+  section.tight { margin: 56px 0; }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 34px;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin: 0 0 8px;
+    text-wrap: pretty;
+  }
+  h2 em { font-style: italic; color: var(--pink); font-weight: 600; }
+  h2 .num {
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--pink);
+    display: block;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  h3 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: -0.005em;
+    margin: 40px 0 10px;
+  }
+  h4 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 28px 0 8px;
+  }
+  p { margin: 0 0 14px; }
+  p + p { margin-top: 0; }
+
+  .lede {
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 680px;
+    margin-bottom: 24px;
+  }
+
+  /* TLDR */
+  .tldr {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px;
+    box-shadow: var(--shadow-sm);
+  }
+  .tldr h2 { font-size: 22px; margin-bottom: 8px; }
+  .tldr ol { margin: 16px 0 0; padding-left: 0; counter-reset: tldr; list-style: none; }
+  .tldr ol li {
+    counter-increment: tldr;
+    padding: 14px 0 14px 44px;
+    border-top: 1px solid var(--hairline);
+    position: relative;
+    font-size: 15.5px;
+  }
+  .tldr ol li:first-child { border-top: 0; }
+  .tldr ol li::before {
+    content: counter(tldr, decimal-leading-zero);
+    position: absolute;
+    left: 0; top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--pink);
+    font-weight: 600;
+  }
+  .tldr ol li b { font-weight: 600; }
+
+  /* Scorecard */
+  .scorecard {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 16px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .scorecard th, .scorecard td {
+    text-align: left;
+    padding: 14px 20px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--hairline);
+    vertical-align: middle;
+  }
+  .scorecard th {
+    background: var(--cream);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .scorecard tr:last-child td { border-bottom: 0; }
+  .scorecard td.axis { font-weight: 600; }
+  .scorecard td.note { color: var(--ink-soft); font-size: 13px; }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--mono);
+    letter-spacing: 0.02em;
+  }
+  .pill .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  .s-good   { background: #E9F4ED; color: #2E6A3F; }
+  .s-good .dot { background: #2E6A3F; }
+  .s-ok     { background: #FAF1E0; color: #8A5A0B; }
+  .s-ok .dot { background: #C08A18; }
+  .s-bad    { background: #FCEAEE; color: #A21339; }
+  .s-bad .dot { background: #A21339; }
+
+  /* Findings */
+  .finding {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin: 16px 0;
+    box-shadow: var(--shadow-sm);
+  }
+  .finding-head {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .finding-head .id {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--pink);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .finding-head h5 {
+    margin: 0;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--ink);
+    flex: 1;
+    min-width: 0;
+  }
+  .sev {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .sev-P0 { background: var(--sev-p0-bg); color: var(--sev-p0); }
+  .sev-P1 { background: var(--sev-p1-bg); color: var(--sev-p1); }
+  .sev-P2 { background: var(--sev-p2-bg); color: var(--sev-p2); }
+
+  .finding p { font-size: 15px; color: var(--ink); }
+  .finding p.observed { color: var(--ink-soft); }
+  .finding .why {
+    font-size: 14px;
+    color: var(--ink-soft);
+    border-top: 1px dashed var(--hairline);
+    padding-top: 12px;
+    margin-top: 12px;
+  }
+  .finding .why b { color: var(--ink); font-weight: 600; }
+
+  /* Evidence */
+  .evidence {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 14px 0 4px;
+  }
+  .evidence figure {
+    margin: 0;
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--cream);
+  }
+  .evidence img {
+    display: block;
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    object-position: top center;
+  }
+  .evidence figcaption {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    padding: 6px 10px;
+    background: var(--white);
+    border-top: 1px solid var(--hairline);
+    text-transform: uppercase;
+  }
+
+  /* Swatches inline */
+  .sw {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px 2px 4px;
+    border-radius: 6px;
+    background: var(--cream);
+    font-family: var(--mono);
+    font-size: 12px;
+    border: 1px solid var(--hairline);
+    margin: 0 2px;
+    vertical-align: middle;
+  }
+  .sw i {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    display: inline-block;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  /* Ledger table */
+  .ledger {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 16px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    font-size: 14px;
+  }
+  .ledger th, .ledger td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--hairline);
+    vertical-align: top;
+  }
+  .ledger th {
+    background: var(--cream);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .ledger tr:last-child td { border-bottom: 0; }
+  .ledger td.rule { font-weight: 600; width: 28%; }
+  .ledger td.status { width: 110px; }
+  .ledger td.note { color: var(--ink-soft); }
+
+  /* Priority list */
+  .prio {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .prio-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--pink);
+    border-radius: 12px;
+    padding: 18px 22px;
+  }
+  .prio-card.p0 { border-left-color: var(--sev-p0); }
+  .prio-card.p1 { border-left-color: var(--sev-p1); }
+  .prio-card.p2 { border-left-color: var(--sev-p2); }
+  .prio-card h5 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .prio-card p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 4px 0 0;
+  }
+  .prio-card .ref {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+
+  /* Closing */
+  .closer {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 40px;
+    box-shadow: var(--shadow-lg);
+    margin-top: 24px;
+  }
+  .closer h2 { margin-bottom: 12px; }
+  .closer p { font-size: 16px; color: var(--ink-soft); }
+  .closer ul {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+    font-size: 15px;
+  }
+  .closer ul li {
+    padding: 10px 0;
+    border-top: 1px solid var(--hairline);
+    color: var(--ink);
+  }
+  .closer ul li:first-child { border-top: 0; }
+  .closer ul li b { font-weight: 600; color: var(--pink); margin-right: 8px; }
+
+  hr.rule {
+    border: 0;
+    border-top: 1px solid var(--hairline);
+    margin: 64px 0;
+  }
+
+  /* Quote */
+  blockquote {
+    margin: 16px 0;
+    padding: 12px 18px;
+    border-left: 3px solid var(--pink);
+    background: var(--cream);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+  }
+
+  /* Inline code */
+  code {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: var(--cream);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--ink);
+  }
+
+  @media (max-width: 640px) {
+    .doc { padding: 40px 18px 96px; }
+    h1.title { font-size: 36px; }
+    h2 { font-size: 26px; }
+    .finding { padding: 18px; }
+    .closer { padding: 24px; }
+    .scorecard th, .scorecard td { padding: 10px 12px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<main class="doc">
+
+  <!-- ============== MASTHEAD ============== -->
+  <header class="masthead">
+    <div class="crumb">Next Visit family <span class="dot">·</span> Design audit <span class="dot">·</span> Step 1 of 3</div>
+    <h1 class="title">Two products, <em>one brand</em> — and right now they don&rsquo;t feel like it.</h1>
+    <p class="deck">An honest audit of Next Visit (couples) and Go (trip planner) against the current BRAND.md. Findings, evidence, scorecard, and a priority list. No proposals yet — that&rsquo;s step&nbsp;2.</p>
+
+    <div class="meta-row">
+      <div><b>Scope</b>53 screens · two surfaces (couples + go)</div>
+      <div><b>Reference</b>BRAND.md (provided)</div>
+      <div><b>Output</b>Findings only — proposal pending approval</div>
+    </div>
+  </header>
+
+  <!-- ============== TLDR ============== -->
+  <section class="tldr" id="tldr">
+    <div class="crumb" style="margin-bottom:6px;">The audit in five lines</div>
+    <h2>What I found</h2>
+    <ol>
+      <li><b>Go has quietly become a different brand.</b> The blue primary, the affiliate-colored cards, the serif italic everywhere — it reads like a sibling-shaped-stranger, not the same family. The pink &ldquo;Save to Next Visit&rdquo; card at the bottom is the only thing that names the parent.</li>
+      <li><b>Couples is mostly on-brand, but emoji is doing all the iconography</b> — for lists, settings, notification rows, quizzes, music. It&rsquo;s warm, but it&rsquo;s noisy and brittle, and it puts a hard ceiling on how calm the product can ever feel.</li>
+      <li><b>Three off-palette accent surfaces leak through both products.</b> Green (music card, &ldquo;With Partner&rdquo; card on settings), purple (Quizzes, Airalo), and the entire affiliate rainbow on Go. BRAND.md is explicit: <i>never use teal, pure black, or grey outside the text variables</i>. Today the rule is broken in at least eight places.</li>
+      <li><b>The countdown — your single best emotional moment — is duplicated, not unified.</b> Couples renders it as a pink gradient with floating hearts; Go renders it as a blue gradient with the destination set in Fraunces italic. Same anatomy, different brand. This is the most fixable problem you have.</li>
+      <li><b>Cross-product navigation is one button each way, and it works.</b> &ldquo;Save to Next Visit&rdquo; on Go and &ldquo;Plan a new trip&rdquo; on couples Home. The handoff <i>moment</i> is fine. The visual handshake — i.e. the trip card that lands on couples Home after save — is doing too little to feel rewarding.</li>
+    </ol>
+  </section>
+
+  <!-- ============== METHODOLOGY ============== -->
+  <section class="tight" id="method">
+    <h2><span class="num">Methodology</span>What was looked at, and against what</h2>
+    <p class="lede">I reviewed all 53 attached screens and held each one up against the current BRAND.md across eight axes. Where a finding is subjective (tone, density, voice), I&rsquo;ve said so. Where it&rsquo;s an explicit rule violation, I&rsquo;ve called the rule by name.</p>
+
+    <h4>Axes</h4>
+    <p>Brand consistency · Visual hierarchy · Information density · Mobile UX · Typography · Component patterns · Empty &amp; loading states · Cross-product cohesion.</p>
+
+    <h4>Scoring</h4>
+    <p>Each axis gets a three-state read: <span class="pill s-good"><span class="dot"></span>solid</span> &nbsp; <span class="pill s-ok"><span class="dot"></span>drifting</span> &nbsp; <span class="pill s-bad"><span class="dot"></span>broken</span>. &ldquo;Drifting&rdquo; means it works but isn&rsquo;t systematized; &ldquo;broken&rdquo; means a BRAND.md rule is being violated or the pattern would fail a usability review.</p>
+  </section>
+
+  <!-- ============== SCORECARD ============== -->
+  <section id="scorecard">
+    <h2><span class="num">The scorecard</span>Eight axes, two products, at a glance</h2>
+    <p class="lede">The detailed findings sit below. This is the headline read.</p>
+
+    <table class="scorecard">
+      <thead>
+        <tr>
+          <th>Axis</th>
+          <th>Next Visit (couples)</th>
+          <th>Go (trip planner)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="axis">Brand consistency with BRAND.md</td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+          <td><span class="pill s-bad"><span class="dot"></span>broken</span></td>
+        </tr>
+        <tr>
+          <td class="axis">Visual hierarchy</td>
+          <td><span class="pill s-good"><span class="dot"></span>solid</span></td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+        </tr>
+        <tr>
+          <td class="axis">Information density</td>
+          <td><span class="pill s-good"><span class="dot"></span>solid</span></td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+        </tr>
+        <tr>
+          <td class="axis">Mobile UX</td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+        </tr>
+        <tr>
+          <td class="axis">Typography</td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+        </tr>
+        <tr>
+          <td class="axis">Component patterns</td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+          <td><span class="pill s-bad"><span class="dot"></span>broken</span></td>
+        </tr>
+        <tr>
+          <td class="axis">Empty &amp; loading states</td>
+          <td><span class="pill s-good"><span class="dot"></span>solid</span></td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+        </tr>
+        <tr>
+          <td class="axis">Cross-product cohesion</td>
+          <td colspan="2" style="text-align:center;"><span class="pill s-bad"><span class="dot"></span>broken</span> &nbsp; <span style="color:var(--ink-faint); font-size:13px;">— scored jointly</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== NEXT VISIT ============== -->
+  <section id="couples">
+    <h2><span class="num">Section 1 — couples</span>Next Visit: <em>calm, mostly</em></h2>
+    <p class="lede">The voice is on. Voice + tone is the strongest part of the product right now — &ldquo;the space for the two of you&rdquo;, &ldquo;made for you two&rdquo;, &ldquo;your story starts here&rdquo;. The issues are visual, not editorial.</p>
+
+    <!-- C-01 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">C-01</span>
+        <h5>Onboarding is the cleanest part of the product — and isn&rsquo;t letting the rest of the app follow its lead</h5>
+        <span class="sev sev-P2">P2</span>
+      </div>
+      <p class="observed">Four screens, single card centered on cream, one decision per screen, copy is calm and specific (&ldquo;So we can quietly remember it for you.&rdquo;). Pink primary, pink-tinted card shadow, sentence case. This is what the brand looks like at its best.</p>
+      <div class="evidence">
+        <figure><img src="screens/s01.png" alt=""><figcaption>Onboarding · name</figcaption></figure>
+        <figure><img src="screens/s02.png" alt=""><figcaption>Onboarding · birthday</figcaption></figure>
+        <figure><img src="screens/s03.png" alt=""><figcaption>Create / join</figcaption></figure>
+        <figure><img src="screens/s04.png" alt=""><figcaption>Partner code</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> The onboarding sets a quality bar that the rest of couples doesn&rsquo;t quite reach. The Home, Us, and Memories screens should feel like this. Right now they introduce extra colors and emoji that an onboarding flow has the discipline to avoid.</p>
+    </div>
+
+    <!-- C-02 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">C-02</span>
+        <h5>Three off-brand accent surfaces on Us / Settings</h5>
+        <span class="sev sev-P0">P0</span>
+      </div>
+      <p class="observed">The &ldquo;Our song&rdquo; card on Us renders as a <b>green</b> gradient with a Spotify embed inside; the Quizzes card uses a <b>purple/lavender</b> surface; the &ldquo;With Partner 2&rdquo; banner on Settings uses a <b>mint/green</b> gradient. Green and purple are not in BRAND.md; mint reads close to teal, which the brand explicitly forbids.</p>
+      <div class="evidence">
+        <figure><img src="screens/s10.png" alt=""><figcaption>Us · green music card</figcaption></figure>
+        <figure><img src="screens/s12.png" alt=""><figcaption>Us · purple Quizzes card</figcaption></figure>
+        <figure><img src="screens/s06.png" alt=""><figcaption>Settings · green &ldquo;with partner&rdquo;</figcaption></figure>
+        <figure><img src="screens/s25.png" alt=""><figcaption>Memory · green song embed</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> BRAND.md says <i>&ldquo;never use teal, pure black, or grey outside the text variables.&rdquo;</i> Today the Us page has three different accent palettes within a single scroll. This is the single biggest visual reason couples doesn&rsquo;t feel as quiet as the brand voice claims.</p>
+    </div>
+
+    <!-- C-03 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">C-03</span>
+        <h5>Emoji is doing all the iconography</h5>
+        <span class="sev sev-P1">P1</span>
+      </div>
+      <p class="observed">Every list, every settings row, every quiz tile, every category card uses an emoji as its visual anchor — heart, party-popper, sun, sparkle, lightbulb, dice, baby, money-bag, swirl, telephone, clapper, lock. Eleven lists. Six notification rows. Four quiz tiles. They&rsquo;re inconsistent (some flat, some 3D, some color, some not) and they render differently across operating systems.</p>
+      <div class="evidence">
+        <figure><img src="screens/s12.png" alt=""><figcaption>Quizzes</figcaption></figure>
+        <figure><img src="screens/s19.png" alt=""><figcaption>Lists index</figcaption></figure>
+        <figure><img src="screens/s20.png" alt=""><figcaption>Lists detail</figcaption></figure>
+        <figure><img src="screens/s07.png" alt=""><figcaption>Notification rows</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> Emoji is fine as a tonal grace note (the brand mark is 💕). It&rsquo;s the wrong primary iconography for a product whose ambition is &ldquo;calm, intentional, thoughtful friend.&rdquo; A unified monoline icon set, with pink as the only accent, would buy the product more calm than any other single change.</p>
+    </div>
+
+    <!-- C-04 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">C-04</span>
+        <h5>Hero treatments on Home are doing three different things</h5>
+        <span class="sev sev-P1">P1</span>
+      </div>
+      <p class="observed">Before a trip: a pink-to-pink-soft gradient card with two floating 3D hearts and a white &ldquo;Plan a trip ✨&rdquo; button (button is white, pink text, sparkle emoji). After a trip: a more saturated pink card with &ldquo;19 days to go&rdquo;, no hearts, a pill-shaped &ldquo;Trip details&rdquo; dropdown. Directly below the countdown sits a third pink-gradient card — &ldquo;Plan a new trip&rdquo; — that looks visually identical to the hero. Three pink-on-pink cards stacked.</p>
+      <div class="evidence">
+        <figure><img src="screens/s05.png" alt=""><figcaption>Home · pre-trip</figcaption></figure>
+        <figure><img src="screens/s28.png" alt=""><figcaption>Home · post-save</figcaption></figure>
+        <figure><img src="screens/s27.png" alt=""><figcaption>Home · &ldquo;Just saved&rdquo; banner</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> A hero should be one thing. Right now &ldquo;hero&rdquo; means three different cards on three different states, and once a trip is saved they all compete. Only the countdown deserves hero status; the others should drop to secondary-card density.</p>
+    </div>
+
+    <!-- C-05 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">C-05</span>
+        <h5>Input styling is inconsistent</h5>
+        <span class="sev sev-P2">P2</span>
+      </div>
+      <p class="observed">The name input on onboarding has a pink hairline border. The birthday picker has no border and a grey fill. The partner-code input has a thicker pink border than the name input. The Where input on Add Memory has a pink border; the From/To dates next to it are borderless. Within a single form the input style varies.</p>
+      <div class="evidence">
+        <figure><img src="screens/s01.png" alt=""><figcaption>Name (pink border)</figcaption></figure>
+        <figure><img src="screens/s02.png" alt=""><figcaption>Date (grey, no border)</figcaption></figure>
+        <figure><img src="screens/s09.png" alt=""><figcaption>Memory form (mixed)</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> BRAND.md gives <code>10px</code> radius for inputs and a default border token. One input token, applied everywhere, fixes this in a day.</p>
+    </div>
+
+    <!-- C-06 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">C-06</span>
+        <h5>Memories index introduces a black/dark segmented control</h5>
+        <span class="sev sev-P1">P1</span>
+      </div>
+      <p class="observed">The Timeline / Gallery / Map switcher on the Memories index uses a <b>solid black</b> pill for the active state. BRAND.md: <i>&ldquo;Never use pure black.&rdquo;</i> The same dark-pill pattern appears on the trip detail tabs on Go (Flights / Stay / Things to do / Prep).</p>
+      <div class="evidence">
+        <figure><img src="screens/s22.png" alt=""><figcaption>Couples · Memories index</figcaption></figure>
+        <figure><img src="screens/s41.png" alt=""><figcaption>Go · trip detail tabs</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> This is the only place a near-black appears in the active state. A pink-tinted ink (or a soft pink fill with pink text) would fix it cleanly and match the rest of the system.</p>
+    </div>
+
+    <!-- C-07 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">C-07</span>
+        <h5>Photos / story is in transition and currently shows only an empty state</h5>
+        <span class="sev sev-P1">P1</span>
+      </div>
+      <p class="observed">&ldquo;Your story starts here&rdquo; — a single card, single CTA, one camera glyph. Lovely empty state, on-brand voice. But the &ldquo;hybrid capture model (unsorted + tagged sections)&rdquo; that you flagged in the brief is not visible anywhere in these screens. The Add bottom-sheet shows two options (&ldquo;Add photos&rdquo; / &ldquo;Add memory&rdquo;) with two more off-palette icon tiles (blue, green).</p>
+      <div class="evidence">
+        <figure><img src="screens/s22.png" alt=""><figcaption>Empty state</figcaption></figure>
+        <figure><img src="screens/s23.png" alt=""><figcaption>Add sheet · blue/green tiles</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> The empty state is fine; what&rsquo;s missing is the populated state, the Unsorted bucket, and the tagging affordance. We&rsquo;ll need to design these from scratch in step 3 — there&rsquo;s nothing to audit yet.</p>
+    </div>
+
+    <!-- C-08 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">C-08</span>
+        <h5>Footer chrome and wordmark drift</h5>
+        <span class="sev sev-P2">P2</span>
+      </div>
+      <p class="observed">Top-right on Home: &ldquo;Next Visit 💕&rdquo; — sans serif, bold, sentence case, brand-mark glued to the end. On Go: &ldquo;Next <i>Visit</i>&rdquo; — italic accent on the second word, no heart. Two different wordmarks for one product family. Couples also adds tiny grey footer text (&ldquo;Made for the two of you&rdquo;, &ldquo;Next Visit · made for you two&rdquo;) which is sweet but duplicated on every screen.</p>
+      <div class="evidence">
+        <figure><img src="screens/s05.png" alt=""><figcaption>Couples wordmark</figcaption></figure>
+        <figure><img src="screens/s30.png" alt=""><figcaption>Go wordmark</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> The wordmark is the cheapest unification you can do. One mark, used identically in both products, with one consistent position.</p>
+    </div>
+
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== GO ============== -->
+  <section id="go">
+    <h2><span class="num">Section 2 — go</span>Go: <em>a different brand</em>, wearing the same wordmark</h2>
+    <p class="lede">Go is the bigger problem. It&rsquo;s a well-built planner; the flow is good, the AI windows are genuinely clever, the affiliate density is appropriate to the job. But it doesn&rsquo;t look like Next Visit anymore. It looks like a confident neighbor.</p>
+
+    <!-- G-01 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">G-01</span>
+        <h5>The blue primary rebrand has eaten the brand</h5>
+        <span class="sev sev-P0">P0</span>
+      </div>
+      <p class="observed">Primary CTAs (&ldquo;Next — Where?&rdquo;, &ldquo;Build my trip&rdquo;), step indicators (1/2/3 circles in pale blue), progress bars, focused-card outlines (the &ldquo;Solo&rdquo; selection card on step 1), the &ldquo;See accommodations&rdquo; button, the entire &ldquo;You&rsquo;re all set&rdquo; trip-detail hero, the flight cards, the stop counter chips — all blue. The serif italic accent words in titles also render in blue. The pink primary appears only in the bottom &ldquo;Save to Next Visit&rdquo; card on the last screen.</p>
+      <div class="evidence">
+        <figure><img src="screens/s29.png" alt=""><figcaption>Step 1 · blue CTA</figcaption></figure>
+        <figure><img src="screens/s32.png" alt=""><figcaption>Step 2 · blue accents</figcaption></figure>
+        <figure><img src="screens/s37.png" alt=""><figcaption>Step 3 · blue CTA</figcaption></figure>
+        <figure><img src="screens/s41.png" alt=""><figcaption>Trip · blue hero</figcaption></figure>
+        <figure><img src="screens/s50.png" alt=""><figcaption>Flight cards</figcaption></figure>
+        <figure><img src="screens/s49.png" alt=""><figcaption>&ldquo;You&rsquo;re all set&rdquo; · blue</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> BRAND.md: <i>Primary <span class="sw"><i style="background:#F43F6A"></i>#F43F6A</span></i>. Today Go ships with <span class="sw"><i style="background:#0770e3"></i>~#0770E3</span> as its primary. A user who clicks &ldquo;Save to Next Visit&rdquo; goes from a blue product to a pink product and has to do the brand reconciliation in their head. Killing this is the single highest-leverage change in the audit.</p>
+    </div>
+
+    <!-- G-02 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">G-02</span>
+        <h5>Affiliate cards are a brand-color rainbow</h5>
+        <span class="sev sev-P0">P0</span>
+      </div>
+      <p class="observed">Stay section: <span class="sw"><i style="background:#003580"></i>navy</span> Booking.com card. Things-to-do: <span class="sw"><i style="background:#C02828"></i>red</span> Klook card, <span class="sw"><i style="background:#1F8A5B"></i>green</span> Viator card, <span class="sw"><i style="background:#2EA5A5"></i>teal</span> GetYourGuide card. Before-you-go: <span class="sw"><i style="background:#C9651A"></i>orange</span> DiscoverCars, <span class="sw"><i style="background:#3D2EB8"></i>purple</span> Airalo, <span class="sw"><i style="background:#1F5E3C"></i>dark green</span> SafetyWing. Seven full-bleed colored cards in a single scroll.</p>
+      <div class="evidence">
+        <figure><img src="screens/s42.png" alt=""><figcaption>Stay · navy</figcaption></figure>
+        <figure><img src="screens/s43.png" alt=""><figcaption>Activities · red/green/teal</figcaption></figure>
+        <figure><img src="screens/s44.png" alt=""><figcaption>Before · orange/purple/green</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> Three rules broken in one block: teal is named-banned in BRAND.md, the page is <i>not</i> calm, and the affiliate brand outranks Next Visit&rsquo;s own brand inside its own product. There&rsquo;s an obvious move here — neutral cards with a small monogram or wordmark in the corner — but I&rsquo;ll save that for step 2.</p>
+    </div>
+
+    <!-- G-03 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">G-03</span>
+        <h5>Gradient dashed-border &ldquo;AI&rdquo; buttons are a third button pattern</h5>
+        <span class="sev sev-P1">P1</span>
+      </div>
+      <p class="observed">&ldquo;Find us somewhere&rdquo;, &ldquo;Find cheapest windows&rdquo;, &ldquo;Find my neighbourhood&rdquo;, &ldquo;Pick top activities for us&rdquo;, &ldquo;Find us a different route&rdquo;, &ldquo;Try again&rdquo;: all rendered as a pink-to-yellow gradient pill with an orange dashed border and a sparkle emoji. They&rsquo;re lovely, but they&rsquo;re a third button style alongside primary (blue today, pink in the future) and secondary (white). Six of them appear in the planning flow.</p>
+      <div class="evidence">
+        <figure><img src="screens/s33.png" alt=""><figcaption>Step 1 · &ldquo;Find us somewhere&rdquo;</figcaption></figure>
+        <figure><img src="screens/s38.png" alt=""><figcaption>Step 3 · &ldquo;Find cheapest windows&rdquo;</figcaption></figure>
+        <figure><img src="screens/s48.png" alt=""><figcaption>Route · &ldquo;Try again&rdquo;</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> A distinct &ldquo;AI suggestion&rdquo; pattern is a good idea. The execution borrows yellow (also off-palette) and the orange dashed border reads like a system warning. Keep the idea, redo the surface in pink + cream with a soft sparkle.</p>
+    </div>
+
+    <!-- G-04 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">G-04</span>
+        <h5>Headlines use Fraunces italic inline accent — and it works</h5>
+        <span class="sev sev-P2">P2</span>
+      </div>
+      <p class="observed">&ldquo;Skip the <i>planning.</i>&rdquo; · &ldquo;Where to <i>next?</i>&rdquo; · &ldquo;When are <i>you going?</i>&rdquo; · &ldquo;Three ideas <i>for you</i>&rdquo;. The italic accent word at the end of each title is a really nice device. It also shows up on couples (&ldquo;Our <i>little corner</i>&rdquo;, &ldquo;Add a <i>memory</i>&rdquo;, &ldquo;Our <i>anniversary</i>&rdquo;).</p>
+      <div class="evidence">
+        <figure><img src="screens/s29.png" alt=""><figcaption>&ldquo;Skip the planning.&rdquo;</figcaption></figure>
+        <figure><img src="screens/s10.png" alt=""><figcaption>&ldquo;Our little corner&rdquo;</figcaption></figure>
+        <figure><img src="screens/s09.png" alt=""><figcaption>&ldquo;Add a memory&rdquo;</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> This is a real shared device across both products. Two things to fix: the accent color today is blue on Go and pink on couples; make it pink everywhere. And codify it (1–3 words, always at the end, never on a body sentence).</p>
+    </div>
+
+    <!-- G-05 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">G-05</span>
+        <h5>The countdown is the right idea, in the wrong color</h5>
+        <span class="sev sev-P0">P0</span>
+      </div>
+      <p class="observed">&ldquo;You&rsquo;re all set&rdquo; → big blue gradient card with destination set in Fraunces italic + sans, date range, <b>NN days to go</b>, two outlined buttons (Copy as text / Share link), tabs below. Same anatomy as couples Home countdown, just blue.</p>
+      <div class="evidence">
+        <figure><img src="screens/s41.png" alt=""><figcaption>Go · countdown (blue)</figcaption></figure>
+        <figure><img src="screens/s28.png" alt=""><figcaption>Couples · countdown (pink)</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> This is the most emotionally important moment in either product, and it&rsquo;s the most fixable. One countdown component, one color, one typography lockup, used in both products. If we do nothing else, do this.</p>
+    </div>
+
+    <!-- G-06 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">G-06</span>
+        <h5>Results page works hard; some of the work isn&rsquo;t legible</h5>
+        <span class="sev sev-P1">P1</span>
+      </div>
+      <p class="observed">&ldquo;Three ideas for you&rdquo; — full-bleed image, title row with city/country, italic one-line description, three KPI columns (Flight / Est. cost / Best time), and 4 highlight chips. Density is right for the job; readability of the KPI row is borderline at mobile width (three columns × small caps label × small black value). Chips below are light blue pills (off-palette) with subtle borders.</p>
+      <div class="evidence">
+        <figure><img src="screens/s34.png" alt=""><figcaption>Results card</figcaption></figure>
+        <figure><img src="screens/s36.png" alt=""><figcaption>Route card</figcaption></figure>
+        <figure><img src="screens/s40.png" alt=""><figcaption>Cheapest-window card</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> This is the &ldquo;efficient planner&rdquo; tone working correctly — but the chips need to be a single brand color (or neutral) and the KPI row needs more vertical air. Easy fixes.</p>
+    </div>
+
+    <!-- G-07 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">G-07</span>
+        <h5>Save-to-Next-Visit card is the one piece of brand glue on Go</h5>
+        <span class="sev sev-P2">P2</span>
+      </div>
+      <p class="observed">Bottom of trip detail: pink gradient card, &ldquo;DON&rsquo;T LOSE THIS TRIP&rdquo;, &ldquo;Plan it <i>together →</i>&rdquo;, white &ldquo;Save to Next Visit&rdquo; button with pink text and the 💕 mark, three-bullet footer (Free · Just an email · Built for couples). Voice is correct. Visual is correct. It works.</p>
+      <div class="evidence">
+        <figure><img src="screens/s45.png" alt=""><figcaption>Save card · single column</figcaption></figure>
+        <figure><img src="screens/s54.png" alt=""><figcaption>Save card · route variant</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> This card and the &ldquo;JUST SAVED&rdquo; banner on couples Home (s27) are the only two visual handshakes between products. Both currently work in isolation; together they could be choreographed to feel like a single moment.</p>
+    </div>
+
+    <!-- G-08 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">G-08</span>
+        <h5>Step indicators, progress bars, and number badges use four different blue tones</h5>
+        <span class="sev sev-P1">P1</span>
+      </div>
+      <p class="observed">The thick filled progress bar segment is a saturated cobalt. The pale outline progress segments are a light blue. The &ldquo;1, 2, 3&rdquo; circular section badges are a desaturated lavender-blue. The card outlines on selection are yet another blue. None of them is the same blue as the primary button.</p>
+      <p class="why"><b>Why it matters.</b> Worth flagging because it&rsquo;s how the blue rebrand snuck in: not one color, but a small system of them. When we move to pink, one tonal scale (pink-100 → pink-700) covers all four cases.</p>
+    </div>
+
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== COHESION ============== -->
+  <section id="cohesion">
+    <h2><span class="num">Section 3 — cohesion</span>Where the two products <em>meet</em></h2>
+    <p class="lede">There are three places the products touch: the wordmark, the handoff card on Go, and the trip card on couples Home after save. The first is the weakest; the second is good; the third is missing the moment.</p>
+
+    <!-- X-01 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">X-01</span>
+        <h5>Two wordmarks, one brand</h5>
+        <span class="sev sev-P1">P1</span>
+      </div>
+      <p class="observed">Couples Home: <b>Next Visit</b> + 💕, top-right, sans serif. Go: <b>Next <i>Visit</i></b>, top-left, italic-accent treatment, no mark. Different position, different typography, different presence of the brand glyph.</p>
+      <div class="evidence">
+        <figure><img src="screens/s05.png" alt=""><figcaption>Couples</figcaption></figure>
+        <figure><img src="screens/s29.png" alt=""><figcaption>Go</figcaption></figure>
+      </div>
+    </div>
+
+    <!-- X-02 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">X-02</span>
+        <h5>The handoff moment from go → couples is half-built</h5>
+        <span class="sev sev-P1">P1</span>
+      </div>
+      <p class="observed">On Go, &ldquo;Save to Next Visit&rdquo; lives in a beautifully on-brand pink card at the end of the trip. On couples Home after save, the result is a slim banner &ldquo;JUST SAVED · Chiang Mai, Thailand · View trip · ×&rdquo; sitting above the now-populated countdown. The countdown itself is the reward; the banner is doing nothing for the moment.</p>
+      <div class="evidence">
+        <figure><img src="screens/s45.png" alt=""><figcaption>Go · save card</figcaption></figure>
+        <figure><img src="screens/s27.png" alt=""><figcaption>Couples · just-saved + countdown</figcaption></figure>
+      </div>
+      <p class="why"><b>Why it matters.</b> &ldquo;Trip arrives on couples Home&rdquo; is the emotional payoff of the whole cross-product loop. It should be a designed moment, not a banner.</p>
+    </div>
+
+    <!-- X-03 -->
+    <div class="finding">
+      <div class="finding-head">
+        <span class="id">X-03</span>
+        <h5>The reverse handoff (couples → go) is currently a domain disclosure</h5>
+        <span class="sev sev-P2">P2</span>
+      </div>
+      <p class="observed">The &ldquo;Plan a new trip&rdquo; card on Home reads: &ldquo;Flights, stays, things to do — on <code>go.next-visit.app</code>&rdquo;. And the small tile below repeats: &ldquo;Plan a trip · Opens go.next-visit.app&rdquo;. The voice exposes the subdomain to the user, which is a developer instinct, not a brand instinct.</p>
+      <p class="why"><b>Why it matters.</b> Per BRAND.md voice (&ldquo;like a thoughtful friend&rdquo;), &ldquo;opens our planner&rdquo; or simply nothing is correct. The subdomain is plumbing.</p>
+    </div>
+
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== BRAND.MD LEDGER ============== -->
+  <section id="brand-md">
+    <h2><span class="num">Section 4 — compliance</span>BRAND.md, rule by rule</h2>
+    <p class="lede">Every explicit rule in BRAND.md, scored against current production. Twelve rules, eight on, four off.</p>
+
+    <table class="ledger">
+      <thead>
+        <tr>
+          <th>Rule (from BRAND.md)</th>
+          <th class="status">Status</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rule">Primary <span class="sw"><i style="background:#F43F6A"></i>#F43F6A</span> across the product</td>
+          <td><span class="pill s-bad"><span class="dot"></span>broken</span></td>
+          <td class="note">Go is shipping blue. See G-01.</td>
+        </tr>
+        <tr>
+          <td class="rule">Surfaces: cream + white only</td>
+          <td><span class="pill s-good"><span class="dot"></span>solid</span></td>
+          <td class="note">Both products use cream as the canvas. Good.</td>
+        </tr>
+        <tr>
+          <td class="rule">Text uses <code>#1A1A1A</code> / <code>#6B6B6B</code> / <code>#999999</code> only</td>
+          <td><span class="pill s-good"><span class="dot"></span>solid</span></td>
+          <td class="note">Body text is consistent across both products.</td>
+        </tr>
+        <tr>
+          <td class="rule">Never teal, pure black, or grey outside text vars</td>
+          <td><span class="pill s-bad"><span class="dot"></span>broken</span></td>
+          <td class="note">GetYourGuide card is teal. Memories index segmented active state is pure black. Mint &ldquo;with partner&rdquo; banner reads close to teal.</td>
+        </tr>
+        <tr>
+          <td class="rule">Borders <code>rgba(244,63,106,0.12)</code> default, <code>0.30</code> hover</td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+          <td class="note">Honored on most cards, missing on the borderless inputs (C-05).</td>
+        </tr>
+        <tr>
+          <td class="rule">Headlines: Fraunces, 600–700, sentence case</td>
+          <td><span class="pill s-good"><span class="dot"></span>solid</span></td>
+          <td class="note">Honored. Sentence case is consistent.</td>
+        </tr>
+        <tr>
+          <td class="rule">Body: system sans, 400</td>
+          <td><span class="pill s-good"><span class="dot"></span>solid</span></td>
+          <td class="note">Honored.</td>
+        </tr>
+        <tr>
+          <td class="rule">Spacing scale 4/8/12/16/24/32/48/64/96</td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+          <td class="note">Card paddings vary (visible 18, 20, 22, 28). Would need code audit to confirm.</td>
+        </tr>
+        <tr>
+          <td class="rule">Radii: 6 / 10 / 14 / 20 / 9999</td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+          <td class="note">Mostly right. The blue affiliate cards on Go look like 12 not 14.</td>
+        </tr>
+        <tr>
+          <td class="rule">Shadows always pink-tinted</td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+          <td class="note">Honored on couples cards; Go&rsquo;s colored affiliate cards have flat / dark shadows.</td>
+        </tr>
+        <tr>
+          <td class="rule">Tap state <code>scale(0.97)</code>; 0.15/0.25/0.4s motion</td>
+          <td><span class="pill s-ok"><span class="dot"></span>drifting</span></td>
+          <td class="note">Can&rsquo;t verify from screens — needs interaction review.</td>
+        </tr>
+        <tr>
+          <td class="rule">Banned phrases (&ldquo;sign up&rdquo;, &ldquo;book now&rdquo;, &ldquo;users&rdquo;, etc.)</td>
+          <td><span class="pill s-good"><span class="dot"></span>solid</span></td>
+          <td class="note">All copy I reviewed respects this. &ldquo;Save to Next Visit&rdquo; &gt; &ldquo;Sign up.&rdquo; Nice.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== PRIORITY ============== -->
+  <section id="priority">
+    <h2><span class="num">Section 5 — priority</span>What ships <em>first</em></h2>
+    <p class="lede">Ranked by impact-per-week-of-work. P0 = brand-blocking, must fix before any new feature. P1 = inconsistency that&rsquo;s costing you a lot of calm. P2 = polish, do in batches.</p>
+
+    <h3 style="margin-bottom:8px; color:var(--sev-p0);">P0 · brand-blocking</h3>
+    <div class="prio">
+      <div class="prio-card p0">
+        <h5>Kill the blue primary on Go <span class="ref">G-01</span></h5>
+        <p>Replace <code>#0770E3</code> with <code>#F43F6A</code> across primary buttons, step indicators, progress bars, selection outlines, the &ldquo;You&rsquo;re all set&rdquo; hero, and the flight cards. Single largest visual change; restores brand instantly.</p>
+      </div>
+      <div class="prio-card p0">
+        <h5>Neutralize the affiliate-rainbow cards <span class="ref">G-02</span></h5>
+        <p>Move all seven partner cards to a single neutral surface (white or cream with a hairline pink border). Keep the partner mark as a small monogram or wordmark in the corner; drop the gradient fills.</p>
+      </div>
+      <div class="prio-card p0">
+        <h5>Unify the countdown <span class="ref">G-05</span></h5>
+        <p>One countdown component, pink gradient, used identically on couples Home and the Go trip-detail page. This is the most emotionally important screen in either product.</p>
+      </div>
+      <div class="prio-card p0">
+        <h5>Retire the off-palette accent cards on Us / Settings <span class="ref">C-02</span></h5>
+        <p>Green music card, purple Quizzes card, mint &ldquo;with partner&rdquo; banner. All three move to white-on-cream with a single pink accent rule.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:8px; color:var(--sev-p1);">P1 · inconsistency tax</h3>
+    <div class="prio">
+      <div class="prio-card p1">
+        <h5>Replace emoji iconography with a single monoline icon set <span class="ref">C-03</span></h5>
+        <p>Lists, settings rows, notification rows, quiz tiles, category cards. Keep 💕 as the brand glyph; everywhere else gets a single icon family.</p>
+      </div>
+      <div class="prio-card p1">
+        <h5>Resolve Home hero into a single component with three states <span class="ref">C-04</span></h5>
+        <p>Pre-trip → empty (gentle), upcoming-trip → countdown, in-trip → live (later). Stop stacking three pink-on-pink cards.</p>
+      </div>
+      <div class="prio-card p1">
+        <h5>Redesign the &ldquo;AI suggestion&rdquo; button pattern <span class="ref">G-03</span></h5>
+        <p>Keep the idea of a distinct AI/serendipity CTA. Lose the yellow gradient and the orange dashed border; they read warning-amber, not magical.</p>
+      </div>
+      <div class="prio-card p1">
+        <h5>Replace the black segmented active state <span class="ref">C-06</span></h5>
+        <p>One segmented-control component, pink-tinted active state, used on Memories and on Go trip-detail tabs.</p>
+      </div>
+      <div class="prio-card p1">
+        <h5>Choreograph the save-to-couples landing moment <span class="ref">X-02</span></h5>
+        <p>Replace the slim &ldquo;JUST SAVED&rdquo; banner with a real arrival moment on couples Home. This is the cross-product payoff.</p>
+      </div>
+      <div class="prio-card p1">
+        <h5>One wordmark, one position <span class="ref">X-01, C-08</span></h5>
+        <p>Pick a single Next Visit wordmark (with or without 💕 — recommend with) and use it identically in both products.</p>
+      </div>
+      <div class="prio-card p1">
+        <h5>Collapse the four Go blues into one pink scale <span class="ref">G-08</span></h5>
+        <p>Progress bar / pill / step badge / selection outline all map to the same pink-100 → pink-700 ramp.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:8px; color:var(--sev-p2);">P2 · polish</h3>
+    <div class="prio">
+      <div class="prio-card p2">
+        <h5>One input style across both products <span class="ref">C-05</span></h5>
+        <p>10px radius, pink hairline border, focused state inherits the brand accent.</p>
+      </div>
+      <div class="prio-card p2">
+        <h5>Codify the italic-accent headline rule <span class="ref">G-04</span></h5>
+        <p>1–3 word italic Fraunces accent at the end of a sentence-case headline, always pink, never on body text.</p>
+      </div>
+      <div class="prio-card p2">
+        <h5>Loosen the results-card KPI row <span class="ref">G-06</span></h5>
+        <p>More vertical air, single chip color, larger value type at mobile width.</p>
+      </div>
+      <div class="prio-card p2">
+        <h5>Remove the subdomain disclosure on couples Home <span class="ref">X-03</span></h5>
+        <p>&ldquo;Opens our planner&rdquo; or nothing. The subdomain is plumbing, not voice.</p>
+      </div>
+      <div class="prio-card p2">
+        <h5>Audit spacing/radius drift in code <span class="ref">scorecard</span></h5>
+        <p>Once tokens are codified in step 2, a code search for off-scale values cleans this up in a single sweep.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== CLOSER ============== -->
+  <section id="closer" class="tight">
+    <div class="closer">
+      <div class="crumb" style="margin-bottom:6px;">Next step</div>
+      <h2>Approve direction, and I&rsquo;ll move to the <em>unified system proposal</em>.</h2>
+      <p>The audit is honest about what&rsquo;s working and what isn&rsquo;t. Before I draft the system spec and mock the ten key screens, two things to confirm:</p>
+      <ul>
+        <li><b>01</b>Are the P0s the right four? If yes, those become the spine of the new system.</li>
+        <li><b>02</b>Any finding you disagree with? &ldquo;Replace emoji&rdquo; is the most opinionated one — happy to argue it either way.</li>
+        <li><b>03</b>For the proposal, do you want me to assume <i>one</i> visual system with tone-of-voice splits, or <i>two visual variants</i> (couples = emotional, go = efficient) of the same primitives?</li>
+        <li><b>04</b>Any constraint I missed (eg. tech stack, framework, partner-mark contractual requirements on affiliate cards)?</li>
+      </ul>
+      <p style="margin-top:24px;">Once you confirm, I&rsquo;ll write the unified system spec (tokens, primitives, hero patterns, handoff choreography), draft an updated BRAND.md, and mock the ten key screens you listed. Then we&rsquo;ll have something to redesign against.</p>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

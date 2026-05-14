@@ -1,0 +1,1289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Component spec — Next Visit family</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+
+<style>
+  /* ════════════════════════════════════════════════════════════════
+     NV TOKENS — the entire token system. Copy this block as-is into
+     a shared `tokens.css` (or :root in your global stylesheet) and
+     both products consume from the same source.
+     ════════════════════════════════════════════════════════════════ */
+  :root {
+    /* Color · pink ramp */
+    --pink-50:  #FFF2F5;
+    --pink-100: #FFE0E8;
+    --pink-200: #FCBED0;
+    --pink-300: #F89BB6;
+    --pink-400: #F4719A;
+    --pink-500: #F43F6A;   /* PRIMARY */
+    --pink-600: #D72955;   /* hover / active */
+    --pink-700: #A8203F;   /* focus rings deep, text on pale pink */
+
+    /* Color · surfaces */
+    --cream:    #FDF0F0;
+    --cream-2:  #FFF7F7;
+    --white:    #FFFFFF;
+
+    /* Color · ink */
+    --ink:        #1A1A1A;
+    --ink-soft:   #6B6B6B;
+    --ink-faint:  #999999;
+
+    /* Borders */
+    --border:        rgba(244, 63, 106, 0.12);
+    --border-hover:  rgba(244, 63, 106, 0.30);
+    --border-active: rgba(244, 63, 106, 0.50);
+    --hairline:      rgba(26, 26, 26, 0.08);
+
+    /* Shadows — always pink-tinted, never pure black */
+    --shadow-sm: 0 1px 2px rgba(244,63,106,.06), 0 4px 12px rgba(244,63,106,.05);
+    --shadow-md: 0 4px 12px rgba(244,63,106,.08), 0 12px 32px rgba(244,63,106,.06);
+    --shadow-lg: 0 8px 24px rgba(244,63,106,.10), 0 32px 64px rgba(244,63,106,.08);
+
+    /* Type */
+    --sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: "Fraunces", Georgia, serif;
+    --mono:  "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    /* Radius */
+    --r-xs:   6px;
+    --r-sm:   10px;
+    --r-md:   14px;  /* default */
+    --r-lg:   20px;  /* hero / countdown / save card */
+    --r-pill: 9999px;
+
+    /* Spacing scale — 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 */
+    --s-1:  4px;
+    --s-2:  8px;
+    --s-3:  12px;
+    --s-4:  16px;
+    --s-5:  24px;
+    --s-6:  32px;
+    --s-7:  48px;
+    --s-8:  64px;
+    --s-9:  96px;
+
+    /* Motion */
+    --dur-fast: 150ms;
+    --dur-base: 250ms;
+    --dur-slow: 400ms;
+    --ease:     cubic-bezier(.2,.7,.3,1);
+    --tap:      scale(0.97);
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     DOC CHROME — for the spec document itself, not for the product.
+     The product styles below this block are scoped under `.nv` so
+     they don't leak into the doc, and the doc styles don't leak in.
+     ════════════════════════════════════════════════════════════════ */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .doc { max-width: 960px; margin: 0 auto; padding: 64px 32px 128px; }
+
+  .crumb {
+    font-family: var(--mono); font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--pink-500);
+  }
+  .crumb .dot { color: var(--ink-faint); margin: 0 8px; font-weight: 400; }
+
+  h1.title {
+    font-family: var(--serif); font-weight: 600;
+    font-size: 48px; line-height: 1.05; letter-spacing: -0.01em;
+    margin: 16px 0 12px;
+  }
+  h1.title em { font-style: italic; color: var(--pink-500); font-weight: 600; }
+  .deck { font-size: 18px; color: var(--ink-soft); max-width: 640px; }
+
+  .masthead { border-bottom: 1px solid var(--hairline); padding-bottom: 32px; margin-bottom: 48px; }
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: 24px; margin-top: 28px;
+    font-size: 13px; color: var(--ink-soft);
+  }
+  .meta-row b { display: block; color: var(--ink-faint); font-weight: 600; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+
+  section { margin: 72px 0; }
+  hr.rule { border: 0; border-top: 1px solid var(--hairline); margin: 56px 0; }
+  h2 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: 32px; letter-spacing: -0.01em; line-height: 1.15;
+    margin: 0 0 8px;
+  }
+  h2 em { font-style: italic; color: var(--pink-500); font-weight: 600; }
+  h2 .num {
+    font-family: var(--sans); font-style: normal; font-weight: 600;
+    font-size: 12px; letter-spacing: 0.08em; color: var(--pink-500);
+    display: block; margin-bottom: 8px; text-transform: uppercase;
+  }
+  h3 { font-family: var(--serif); font-weight: 600; font-size: 22px; margin: 36px 0 10px; letter-spacing: -0.005em; }
+  h4 {
+    font-family: var(--sans); font-weight: 600; font-size: 12px;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint);
+    margin: 24px 0 8px;
+  }
+  p { margin: 0 0 14px; }
+  .lede { font-size: 17px; color: var(--ink-soft); max-width: 720px; margin-bottom: 20px; }
+
+  code {
+    font-family: var(--mono); font-size: 12.5px;
+    background: var(--cream-2); padding: 1px 6px;
+    border-radius: 4px; border: 1px solid var(--hairline); color: var(--ink);
+  }
+
+  /* Code blocks — terminal-ish, easy to copy */
+  pre.codeblock {
+    margin: 12px 0 18px;
+    padding: 18px 22px;
+    background: #1A1A1A;
+    color: #FCBED0;
+    border-radius: var(--r-md);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre;
+    border: 1px solid #2a2a2a;
+  }
+  pre.codeblock .com { color: #999; font-style: italic; }
+  pre.codeblock .kw  { color: var(--pink-400); }
+  pre.codeblock .vl  { color: #FFE0E8; }
+  pre.codeblock .se  { color: #fff; font-weight: 600; }
+  pre.codeblock .at  { color: #F4719A; }
+  pre.codeblock .st  { color: #FCBED0; }
+  pre.codeblock .tag { color: #F4719A; }
+
+  /* Spec component block — every component gets one of these */
+  .comp {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 28px;
+    margin: 18px 0;
+    box-shadow: var(--shadow-sm);
+  }
+  .comp-head { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; margin-bottom: 8px; }
+  .comp-head .id { font-family: var(--mono); font-size: 11px; color: var(--pink-500); font-weight: 600; letter-spacing: 0.04em; }
+  .comp-head h3 { margin: 0; }
+  .comp-head .props { font-family: var(--mono); font-size: 11.5px; color: var(--ink-faint); margin-left: auto; }
+  .comp p.purpose { color: var(--ink-soft); font-size: 14.5px; margin-bottom: 14px; max-width: 640px; }
+
+  .demo {
+    background: var(--cream);
+    border: 1px dashed var(--border-hover);
+    border-radius: var(--r-md);
+    padding: 28px;
+    margin: 14px 0;
+  }
+  .demo + h4 { margin-top: 22px; }
+  .demo-row {
+    display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+  }
+
+  /* States table */
+  table.states {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    margin-top: 10px;
+    background: var(--cream-2);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+    overflow: hidden;
+    font-size: 13px;
+  }
+  table.states th, table.states td {
+    padding: 10px 14px; text-align: left;
+    border-bottom: 1px solid var(--hairline); vertical-align: top;
+  }
+  table.states th {
+    background: var(--white); font-weight: 600;
+    font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-faint);
+  }
+  table.states tr:last-child td { border-bottom: 0; }
+  table.states td.k { font-weight: 600; }
+  table.states td.v { font-family: var(--mono); font-size: 11.5px; color: var(--pink-600); }
+
+  /* Notes callout */
+  .note {
+    margin: 14px 0;
+    padding: 12px 16px;
+    border-left: 3px solid var(--pink-500);
+    background: var(--cream);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .note b { color: var(--pink-600); font-weight: 600; }
+
+  /* Token cards (top of page) */
+  .ramp { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin-top: 14px; }
+  .ramp .sw { aspect-ratio: 1; border-radius: var(--r-sm); display: flex; flex-direction: column; justify-content: flex-end; padding: 8px; border: 1px solid var(--hairline); font-family: var(--mono); font-size: 9.5px; }
+  .ramp .sw b { font-size: 10.5px; font-weight: 600; display: block; }
+  .ramp .sw.light { color: var(--ink); }
+  .ramp .sw.dark  { color: var(--white); }
+  @media (max-width: 640px) { .ramp { grid-template-columns: repeat(4, 1fr); } }
+
+  /* Implementation note tabs (couples vs go) */
+  .impl-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+  .impl {
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--r-md);
+    padding: 18px 20px;
+  }
+  .impl h4 { margin-top: 0; color: var(--pink-500); }
+  .impl ul { font-size: 13.5px; color: var(--ink-soft); padding-left: 18px; margin: 0; }
+  .impl ul li { padding: 4px 0; }
+  .impl code { background: var(--cream); }
+  @media (max-width: 640px) { .impl-row { grid-template-columns: 1fr; } }
+
+  /* Tranche checklist */
+  .tranche {
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--r-md);
+    padding: 22px 26px; margin: 14px 0;
+  }
+  .tranche h3 { margin: 0 0 6px; font-size: 18px; }
+  .tranche .lbl { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
+  .tranche.t1 .lbl { color: #B91530; }
+  .tranche.t2 .lbl { color: #C26A06; }
+  .tranche.t3 .lbl { color: #4A7A3A; }
+  .tranche ul { margin: 8px 0 0; padding-left: 18px; font-size: 14px; }
+  .tranche ul li { padding: 4px 0; color: var(--ink); }
+  .tranche ul li span.ref { color: var(--ink-faint); font-family: var(--mono); font-size: 11.5px; margin-left: 6px; }
+
+  /* ════════════════════════════════════════════════════════════════
+     `.nv` — the product styles. Scoped so they live alongside the
+     doc chrome without collision. Code Web should lift the contents
+     of `.nv .foo { … }` declarations and rename `.nv` away in their
+     real CSS, OR keep `.nv` as a top-level class on every product
+     surface — either works.
+     ════════════════════════════════════════════════════════════════ */
+  .nv, .nv * { box-sizing: border-box; }
+  .nv {
+    font-family: var(--sans);
+    color: var(--ink);
+    line-height: 1.45;
+  }
+  .nv h1, .nv h2, .nv h3, .nv h4, .nv h5, .nv h6 { margin: 0; }
+  .nv p { margin: 0; }
+  .nv button { font-family: inherit; cursor: pointer; }
+  .nv a { color: var(--pink-500); }
+
+  /* ── BUTTON ─────────────────────────────────────────────── */
+  .nv .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: var(--sans); font-weight: 600; font-size: 15px; line-height: 1;
+    padding: 14px 20px;
+    border-radius: var(--r-pill);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform var(--dur-fast) var(--ease),
+                background var(--dur-fast) var(--ease),
+                box-shadow var(--dur-fast) var(--ease),
+                border-color var(--dur-fast) var(--ease);
+    text-decoration: none;
+  }
+  .nv .btn:active { transform: var(--tap); }
+  .nv .btn--primary {
+    background: var(--pink-500); color: var(--white);
+    box-shadow: 0 6px 14px rgba(244,63,106,0.25);
+  }
+  .nv .btn--primary:hover { background: var(--pink-600); }
+  .nv .btn--secondary {
+    background: var(--white); color: var(--ink);
+    border-color: var(--border);
+  }
+  .nv .btn--secondary:hover { border-color: var(--border-hover); }
+  .nv .btn--tertiary {
+    background: transparent; color: var(--pink-500);
+    padding-left: var(--s-1); padding-right: var(--s-1);
+  }
+  .nv .btn--ai {
+    background: linear-gradient(135deg, var(--pink-50), var(--cream));
+    color: var(--pink-600);
+    border: 1px dashed var(--border-active);
+  }
+  .nv .btn--ai:hover { background: linear-gradient(135deg, var(--pink-100), var(--cream)); }
+  .nv .btn--block { display: flex; width: 100%; }
+  .nv .btn--sm { padding: 10px 14px; font-size: 13.5px; }
+  .nv .btn--on-pink { background: var(--white); color: var(--pink-500); }
+  .nv .btn .ph { font-size: 18px; }
+
+  /* ── CARD ───────────────────────────────────────────────── */
+  .nv .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-sm);
+    /* Padding via modifier or inline; default for COUPLES is 24, for GO is 16. */
+  }
+  .nv .card--couples { padding: 24px; }
+  .nv .card--go      { padding: 16px; }
+  .nv .card--interactive { cursor: pointer; transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease); }
+  .nv .card--interactive:hover { border-color: var(--border-hover); box-shadow: var(--shadow-md); }
+  .nv .card__eyebrow {
+    font-family: var(--mono); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: var(--s-2);
+  }
+  .nv .card__title {
+    font-family: var(--sans); font-weight: 600; font-size: 16px;
+    color: var(--ink); margin-bottom: 4px;
+  }
+  .nv .card__desc { font-size: 14px; color: var(--ink-soft); }
+
+  /* ── INPUT ──────────────────────────────────────────────── */
+  .nv .field { display: flex; flex-direction: column; gap: 6px; }
+  .nv .field__label {
+    font-family: var(--mono); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint);
+  }
+  .nv .input {
+    font-family: var(--sans); font-size: 15px; line-height: 1.4;
+    padding: 12px 14px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--ink);
+    outline: 0;
+    transition: border-color var(--dur-fast) var(--ease),
+                box-shadow var(--dur-fast) var(--ease);
+    width: 100%;
+  }
+  .nv .input::placeholder { color: var(--ink-faint); }
+  .nv .input:hover { border-color: var(--border-hover); }
+  .nv .input:focus { border-color: var(--pink-500); box-shadow: 0 0 0 3px rgba(244,63,106,0.12); }
+  .nv .input:disabled { background: var(--cream); opacity: 0.6; cursor: not-allowed; }
+  .nv .input--error { border-color: var(--pink-600); }
+  .nv .input--error:focus { box-shadow: 0 0 0 3px rgba(215,41,85,0.18); }
+
+  /* ── CHIP ───────────────────────────────────────────────── */
+  .nv .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-pill);
+    font-size: 13px; font-weight: 500; color: var(--ink);
+    cursor: pointer;
+    transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+  }
+  .nv .chip:hover { border-color: var(--border-hover); }
+  .nv .chip[aria-pressed="true"] {
+    background: var(--pink-50);
+    border-color: var(--pink-300);
+    color: var(--pink-600);
+  }
+  .nv .chip .ph { font-size: 14px; color: var(--pink-500); }
+
+  /* ── SEGMENTED ──────────────────────────────────────────── */
+  .nv .segmented {
+    display: inline-flex;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: var(--r-pill);
+    padding: 4px;
+    gap: 0;
+  }
+  .nv .segmented__opt {
+    padding: 8px 16px;
+    border-radius: var(--r-pill);
+    font-size: 13.5px; font-weight: 600; color: var(--ink-soft);
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+  }
+  .nv .segmented__opt[aria-selected="true"] {
+    background: var(--white);
+    color: var(--pink-500);
+    box-shadow: 0 2px 6px rgba(244,63,106,0.10);
+  }
+
+  /* ── WORDMARK ──────────────────────────────────────────── */
+  .nv .wordmark {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--serif); font-weight: 600; font-size: 16px;
+    letter-spacing: -0.01em; color: var(--ink);
+  }
+  .nv .wordmark em { font-style: italic; color: var(--pink-500); font-weight: 600; }
+  .nv .wordmark .glyph { font-size: 13px; line-height: 1; }
+
+  /* ── COUNTDOWN (the signature) ─────────────────────────── */
+  .nv .countdown {
+    background: linear-gradient(135deg, var(--pink-500), var(--pink-400));
+    color: var(--white);
+    border-radius: var(--r-lg);
+    box-shadow: 0 12px 32px rgba(244,63,106,0.20);
+    overflow: hidden;
+    position: relative;
+  }
+  .nv .countdown__photo {
+    height: 120px;
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,.10) 0 12px, rgba(255,255,255,.04) 12px 24px),
+      linear-gradient(135deg, var(--pink-600), var(--pink-400));
+    background-size: cover;
+    background-position: center;
+    /* In real use, replace the gradients with `background-image: url(<dest>)` */
+  }
+  .nv .countdown__body { padding: 22px; position: relative; }
+  .nv .countdown__hearts {
+    position: absolute; top: 12px; right: 16px;
+    font-size: 22px; opacity: 0.4;
+  }
+  .nv .countdown__eyebrow {
+    font-family: var(--mono); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,255,255,0.78); margin-bottom: 10px;
+  }
+  .nv .countdown__place {
+    font-family: var(--serif); font-weight: 600; font-size: 24px; line-height: 1.1;
+  }
+  .nv .countdown__place em {
+    font-style: italic; color: rgba(255,255,255,0.85); font-weight: 500;
+  }
+  .nv .countdown__meta {
+    font-size: 12.5px; color: rgba(255,255,255,0.82);
+    margin-top: 4px; margin-bottom: 16px;
+  }
+  .nv .countdown__numeral {
+    font-family: var(--serif); font-weight: 600; font-size: 76px; line-height: 0.95;
+    letter-spacing: -0.02em; display: flex; align-items: baseline; gap: 10px;
+  }
+  .nv .countdown__unit {
+    font-family: var(--serif); font-style: italic; font-weight: 500;
+    font-size: 16px; color: rgba(255,255,255,0.85);
+  }
+  .nv .countdown__actions {
+    display: flex; gap: 8px;
+    margin-top: 20px; padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+  }
+  .nv .countdown__ghost {
+    flex: 1;
+    background: rgba(255,255,255,0.18);
+    color: var(--white);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.20);
+    padding: 10px 12px;
+    border-radius: var(--r-pill);
+    font-size: 12.5px; font-weight: 600;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease);
+  }
+  .nv .countdown__ghost:hover { background: rgba(255,255,255,0.26); }
+
+  /* ── AFFILIATE ROW ─────────────────────────────────────── */
+  .nv .affil {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    text-decoration: none;
+    color: var(--ink);
+    transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+  }
+  .nv .affil:hover { border-color: var(--border-hover); box-shadow: var(--shadow-sm); }
+  .nv .affil__monogram {
+    width: 34px; height: 34px;
+    border-radius: var(--r-sm);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--white); font-weight: 700; font-size: 13.5px;
+    flex-shrink: 0;
+    /* background: <partner brand color> — set inline */
+  }
+  .nv .affil__name { font-size: 14px; font-weight: 600; }
+  .nv .affil__sub  { font-size: 12px; color: var(--ink-soft); }
+
+  /* ── HANDOFF CARD ──────────────────────────────────────── */
+  .nv .handoff {
+    background: linear-gradient(135deg, var(--pink-500), var(--pink-400));
+    color: var(--white);
+    border-radius: var(--r-lg);
+    padding: 22px;
+    box-shadow: var(--shadow-lg);
+  }
+  .nv .handoff__eyebrow {
+    font-family: var(--mono); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.78); margin-bottom: 8px;
+  }
+  .nv .handoff__title {
+    font-family: var(--serif); font-weight: 600; font-size: 24px;
+    line-height: 1.1; margin-bottom: 8px;
+  }
+  .nv .handoff__title em {
+    font-style: italic; color: rgba(255,255,255,0.92); font-weight: 500;
+  }
+  .nv .handoff__copy {
+    color: rgba(255,255,255,0.85); font-size: 13.5px; line-height: 1.4;
+    margin-bottom: 16px;
+  }
+  .nv .handoff__footnote {
+    margin-top: 10px; text-align: center;
+    font-size: 11.5px; color: rgba(255,255,255,0.72);
+  }
+</style>
+</head>
+<body>
+<main class="doc">
+
+  <!-- ============== MASTHEAD ============== -->
+  <header class="masthead">
+    <div class="crumb">Next Visit family <span class="dot">·</span> Component spec <span class="dot">·</span> Developer handoff</div>
+    <h1 class="title">The <em>what</em> and the <em>how</em>.</h1>
+    <p class="deck">Tokens, primitives, and signature components — written as plain HTML/CSS Code Web can lift into either product. One pink ramp, one type system, one set of class names. Couples and Go consume from the same file.</p>
+    <div class="meta-row">
+      <div><b>Companion docs</b>audit.html · proposal.html · mockups.html</div>
+      <div><b>Scope</b>tokens · 8 components · 3 patterns · implementation notes per product</div>
+      <div><b>Implementation</b>Couples (React/Vite) and Go (vanilla, single file) — both</div>
+    </div>
+  </header>
+
+  <!-- ============== HOW TO USE ============== -->
+  <section id="how">
+    <h2><span class="num">How to use this doc</span>One source of truth, two products</h2>
+    <p class="lede">Every component below is written as a single <code>.nv .foo</code> block. Lift it directly. The styles depend only on the <code>:root</code> tokens at the top of this file — paste those into <code>tokens.css</code> and serve from both products.</p>
+
+    <h4>Rules</h4>
+    <ul style="color: var(--ink-soft); font-size: 14.5px; line-height: 1.6;">
+      <li>Never hard-code a color in component CSS. Always reference a token.</li>
+      <li>Padding flexes by product (couples generous, go tight). Everything else is identical.</li>
+      <li>Class names use BEM-ish (<code>block__elem</code>, <code>block--modifier</code>). Stick to it.</li>
+      <li>State conveyed via ARIA attributes (<code>aria-pressed</code>, <code>aria-selected</code>, <code>aria-busy</code>) — not extra classes. Easier to keep accessible.</li>
+      <li>Phosphor icons via <code>&lt;i class="ph ph-name"&gt;&lt;/i&gt;</code>. Duotone reserved for category tiles only.</li>
+    </ul>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== TOKENS ============== -->
+  <section id="tokens">
+    <h2><span class="num">1 · Tokens</span>The <em>pink ramp</em>, surfaces, type, spacing</h2>
+    <p class="lede">Below is the full token file, exactly as it lives at the top of this HTML. Copy as <code>tokens.css</code> and import once.</p>
+
+    <h4>Color · pink ramp</h4>
+    <div class="ramp">
+      <div class="sw light" style="background:#FFF2F5;">pink-50<b>#FFF2F5</b></div>
+      <div class="sw light" style="background:#FFE0E8;">pink-100<b>#FFE0E8</b></div>
+      <div class="sw light" style="background:#FCBED0;">pink-200<b>#FCBED0</b></div>
+      <div class="sw dark"  style="background:#F89BB6;">pink-300<b>#F89BB6</b></div>
+      <div class="sw dark"  style="background:#F4719A;">pink-400<b>#F4719A</b></div>
+      <div class="sw dark"  style="background:#F43F6A; outline: 2px solid var(--pink-500); outline-offset: 2px;">pink-500<b>#F43F6A</b></div>
+      <div class="sw dark"  style="background:#D72955;">pink-600<b>#D72955</b></div>
+      <div class="sw dark"  style="background:#A8203F;">pink-700<b>#A8203F</b></div>
+    </div>
+    <p style="margin-top: 12px; color: var(--ink-soft); font-size: 14px;">
+      <b style="color: var(--ink);">pink-500</b> is the brand primary. <b style="color: var(--ink);">pink-600</b> for hover, active, pressed. <b style="color: var(--ink);">pink-50/100</b> for tints and selected backgrounds. Never use blue. Never use teal. Never use pure black.
+    </p>
+
+    <h4>Full token file</h4>
+<pre class="codeblock"><span class="com">/* Brand tokens — single source of truth */</span>
+<span class="se">:root</span> {
+  <span class="com">/* Color · pink ramp */</span>
+  <span class="at">--pink-50</span>:  <span class="vl">#FFF2F5</span>;
+  <span class="at">--pink-100</span>: <span class="vl">#FFE0E8</span>;
+  <span class="at">--pink-200</span>: <span class="vl">#FCBED0</span>;
+  <span class="at">--pink-300</span>: <span class="vl">#F89BB6</span>;
+  <span class="at">--pink-400</span>: <span class="vl">#F4719A</span>;
+  <span class="at">--pink-500</span>: <span class="vl">#F43F6A</span>;   <span class="com">/* PRIMARY */</span>
+  <span class="at">--pink-600</span>: <span class="vl">#D72955</span>;   <span class="com">/* hover / active */</span>
+  <span class="at">--pink-700</span>: <span class="vl">#A8203F</span>;
+
+  <span class="com">/* Surfaces */</span>
+  <span class="at">--cream</span>:    <span class="vl">#FDF0F0</span>;   <span class="com">/* default page surface */</span>
+  <span class="at">--cream-2</span>:  <span class="vl">#FFF7F7</span>;   <span class="com">/* subtle elevation */</span>
+  <span class="at">--white</span>:    <span class="vl">#FFFFFF</span>;   <span class="com">/* cards, modals */</span>
+
+  <span class="com">/* Ink */</span>
+  <span class="at">--ink</span>:        <span class="vl">#1A1A1A</span>;  <span class="com">/* primary text */</span>
+  <span class="at">--ink-soft</span>:   <span class="vl">#6B6B6B</span>;  <span class="com">/* secondary text */</span>
+  <span class="at">--ink-faint</span>:  <span class="vl">#999999</span>;  <span class="com">/* tertiary / placeholders */</span>
+
+  <span class="com">/* Borders */</span>
+  <span class="at">--border</span>:        <span class="vl">rgba(244, 63, 106, 0.12)</span>;
+  <span class="at">--border-hover</span>:  <span class="vl">rgba(244, 63, 106, 0.30)</span>;
+  <span class="at">--border-active</span>: <span class="vl">rgba(244, 63, 106, 0.50)</span>;
+  <span class="at">--hairline</span>:      <span class="vl">rgba(26, 26, 26, 0.08)</span>;
+
+  <span class="com">/* Shadows — always pink-tinted */</span>
+  <span class="at">--shadow-sm</span>: <span class="vl">0 1px 2px rgba(244,63,106,.06), 0 4px 12px rgba(244,63,106,.05)</span>;
+  <span class="at">--shadow-md</span>: <span class="vl">0 4px 12px rgba(244,63,106,.08), 0 12px 32px rgba(244,63,106,.06)</span>;
+  <span class="at">--shadow-lg</span>: <span class="vl">0 8px 24px rgba(244,63,106,.10), 0 32px 64px rgba(244,63,106,.08)</span>;
+
+  <span class="com">/* Type */</span>
+  <span class="at">--sans</span>:  <span class="vl">-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif</span>;
+  <span class="at">--serif</span>: <span class="vl">"Fraunces", Georgia, serif</span>;
+  <span class="at">--mono</span>:  <span class="vl">"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace</span>;
+
+  <span class="com">/* Radius */</span>
+  <span class="at">--r-xs</span>:   <span class="vl">6px</span>;
+  <span class="at">--r-sm</span>:   <span class="vl">10px</span>;   <span class="com">/* inputs */</span>
+  <span class="at">--r-md</span>:   <span class="vl">14px</span>;   <span class="com">/* default · cards · modals */</span>
+  <span class="at">--r-lg</span>:   <span class="vl">20px</span>;   <span class="com">/* hero · countdown · save card */</span>
+  <span class="at">--r-pill</span>: <span class="vl">9999px</span>;
+
+  <span class="com">/* Spacing scale */</span>
+  <span class="at">--s-1</span>: <span class="vl">4px</span>;   <span class="at">--s-2</span>: <span class="vl">8px</span>;   <span class="at">--s-3</span>: <span class="vl">12px</span>;
+  <span class="at">--s-4</span>: <span class="vl">16px</span>;  <span class="at">--s-5</span>: <span class="vl">24px</span>;  <span class="at">--s-6</span>: <span class="vl">32px</span>;
+  <span class="at">--s-7</span>: <span class="vl">48px</span>;  <span class="at">--s-8</span>: <span class="vl">64px</span>;  <span class="at">--s-9</span>: <span class="vl">96px</span>;
+
+  <span class="com">/* Motion */</span>
+  <span class="at">--dur-fast</span>: <span class="vl">150ms</span>;
+  <span class="at">--dur-base</span>: <span class="vl">250ms</span>;
+  <span class="at">--dur-slow</span>: <span class="vl">400ms</span>;
+  <span class="at">--ease</span>:     <span class="vl">cubic-bezier(.2,.7,.3,1)</span>;
+  <span class="at">--tap</span>:      <span class="vl">scale(0.97)</span>;
+}</pre>
+
+    <h4>Type · scale</h4>
+    <table class="states">
+      <thead><tr><th>Role</th><th>Family</th><th>Weight / Size</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Display</td><td class="v">Fraunces</td><td class="v">600 · 44/48</td><td>Hero on cover surfaces only</td></tr>
+        <tr><td class="k">H1</td><td class="v">Fraunces</td><td class="v">600 · 32/36</td><td>Screen title (couples)</td></tr>
+        <tr><td class="k">H1 · go</td><td class="v">Fraunces</td><td class="v">600 · 28/32</td><td>Screen title (go, denser)</td></tr>
+        <tr><td class="k">H2</td><td class="v">Fraunces</td><td class="v">600 · 22/26</td><td>Section heading</td></tr>
+        <tr><td class="k">Body</td><td class="v">system sans</td><td class="v">400 · 16/24</td><td>Default body</td></tr>
+        <tr><td class="k">Body soft</td><td class="v">system sans</td><td class="v">400 · 15/22 · ink-soft</td><td>Secondary body</td></tr>
+        <tr><td class="k">Label / eyebrow</td><td class="v">system sans</td><td class="v">600 · 11 · upper · 0.08em</td><td>Sectioning, eyebrows</td></tr>
+        <tr><td class="k">Button</td><td class="v">system sans</td><td class="v">600 · 15/1</td><td>All button labels</td></tr>
+        <tr><td class="k">Mono</td><td class="v">JetBrains Mono</td><td class="v">400 · 12</td><td>Codes, metadata, IATA codes</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>Italic-accent rule.</b> 1–3 words, always at the <i>end</i> of a sentence-case headline, always rendered in <code>var(--pink-500)</code>, always Fraunces italic. Never on body text. Never on button labels. Never repeated within a single screen. Markup pattern: <code>&lt;h1&gt;Where to &lt;em&gt;next?&lt;/em&gt;&lt;/h1&gt;</code> + <code>.nv h1 em &#123; font-style: italic; color: var(--pink-500); &#125;</code>.
+    </div>
+
+    <h4>Iconography</h4>
+    <p style="font-size: 14.5px; color: var(--ink-soft);">Phosphor at regular weight (chrome, buttons, lists). Duotone reserved for category tiles only — pink-500 primary + pink-200 secondary. The 💕 emoji is the only emoji in the product; it lives in the wordmark and a few signature moments.</p>
+<pre class="codeblock"><span class="com">&lt;!-- Add to &lt;head&gt; --&gt;</span>
+<span class="tag">&lt;link</span> <span class="at">rel</span>=<span class="st">"stylesheet"</span> <span class="at">href</span>=<span class="st">"https://unpkg.com/@phosphor-icons/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cfb8aaad8ffde1fee1fe">[email&#160;protected]</a>/src/regular/style.css"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;link</span> <span class="at">rel</span>=<span class="st">"stylesheet"</span> <span class="at">href</span>=<span class="st">"https://unpkg.com/@phosphor-icons/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6c1b090e2c5e425d425d">[email&#160;protected]</a>/src/duotone/style.css"</span><span class="tag">&gt;</span>
+
+<span class="com">&lt;!-- Usage --&gt;</span>
+<span class="tag">&lt;i</span> <span class="at">class</span>=<span class="st">"ph ph-airplane-tilt"</span><span class="tag">&gt;&lt;/i&gt;</span>          <span class="com">/* regular */</span>
+<span class="tag">&lt;i</span> <span class="at">class</span>=<span class="st">"ph-duotone ph-heart"</span><span class="tag">&gt;&lt;/i&gt;</span>     <span class="com">/* duotone — category tiles only */</span></pre>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== BUTTON ============== -->
+  <section id="button">
+    <h2><span class="num">2 · Button</span>Three variants, plus one for AI</h2>
+
+    <div class="comp">
+      <div class="comp-head">
+        <span class="id">P-01</span>
+        <h3>Button</h3>
+        <div class="props">.btn · .btn--{primary,secondary,tertiary,ai,on-pink} · .btn--{block,sm}</div>
+      </div>
+      <p class="purpose">Primary (pink fill), secondary (white with hairline border), tertiary (text only), AI (gradient + dashed for serendipitous suggestions), on-pink (used inside pink hero cards like the handoff). All share the pill shape, padding scale, and tap state.</p>
+
+      <h4>Live</h4>
+      <div class="nv demo">
+        <div class="demo-row">
+          <button class="btn btn--primary"><i class="ph ph-paper-plane-tilt"></i>Save to Next Visit</button>
+          <button class="btn btn--secondary">Skip for now</button>
+          <button class="btn btn--tertiary">Back</button>
+          <button class="btn btn--ai"><i class="ph ph-sparkle"></i>Find us somewhere</button>
+        </div>
+        <div class="demo-row" style="margin-top: 14px;">
+          <button class="btn btn--primary btn--block" style="max-width: 360px;">Build my trip <i class="ph ph-arrow-right"></i></button>
+        </div>
+        <div class="demo-row" style="margin-top: 14px;">
+          <button class="btn btn--primary btn--sm">Save</button>
+          <button class="btn btn--secondary btn--sm">Cancel</button>
+        </div>
+      </div>
+
+      <h4>HTML</h4>
+<pre class="codeblock"><span class="tag">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn--primary"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;i</span> <span class="at">class</span>=<span class="st">"ph ph-paper-plane-tilt"</span><span class="tag">&gt;&lt;/i&gt;</span>
+  Save to Next Visit
+<span class="tag">&lt;/button&gt;</span>
+
+<span class="tag">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn--ai btn--block"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;i</span> <span class="at">class</span>=<span class="st">"ph ph-sparkle"</span><span class="tag">&gt;&lt;/i&gt;</span>
+  Find us somewhere
+<span class="tag">&lt;/button&gt;</span></pre>
+
+      <h4>States</h4>
+      <table class="states">
+        <thead><tr><th>State</th><th>Primary</th><th>Secondary</th><th>AI</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Resting</td><td class="v">bg pink-500 · text white</td><td class="v">bg white · border .12</td><td class="v">gradient pink-50→cream · dashed .50</td></tr>
+          <tr><td class="k">Hover</td><td class="v">bg pink-600</td><td class="v">border .30</td><td class="v">gradient pink-100→cream</td></tr>
+          <tr><td class="k">Active / pressed</td><td class="v">transform: scale(0.97)</td><td class="v">transform: scale(0.97)</td><td class="v">transform: scale(0.97)</td></tr>
+          <tr><td class="k">Focus visible</td><td class="v">outline: 3px pink-500 @ 0.4</td><td class="v">outline: 3px pink-500 @ 0.4</td><td class="v">outline: 3px pink-500 @ 0.4</td></tr>
+          <tr><td class="k">Disabled</td><td class="v">bg pink-300 · cursor not-allowed</td><td class="v">opacity 0.5</td><td class="v">opacity 0.5</td></tr>
+          <tr><td class="k">Loading</td><td class="v">aria-busy + spinner-icon swap</td><td class="v">aria-busy + spinner-icon swap</td><td class="v">aria-busy + spinner-icon swap</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        <b>Density.</b> Padding is <code>14×20</code> on couples, <code>12×18</code> on go. Use <code>--s-3</code>/<code>--s-4</code>/<code>--s-5</code> directly in product-specific CSS if the difference matters per surface; otherwise leave as default and let context override.
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== CARD ============== -->
+  <section id="card">
+    <h2><span class="num">3 · Card</span>The atom of the product</h2>
+
+    <div class="comp">
+      <div class="comp-head">
+        <span class="id">P-02</span>
+        <h3>Card</h3>
+        <div class="props">.card · .card--{couples,go,interactive}</div>
+      </div>
+      <p class="purpose">White on cream, pink-tinted shadow, hairline pink border at 0.12 opacity. Padding flexes by density. Hover lift is opt-in via <code>.card--interactive</code> (otherwise cards are static surfaces).</p>
+
+      <h4>Live</h4>
+      <div class="nv demo">
+        <div class="demo-row" style="align-items: stretch;">
+          <div class="card card--couples" style="flex: 1; min-width: 260px;">
+            <div class="card__eyebrow">Our anniversary</div>
+            <div class="card__title">3 January</div>
+            <div class="card__desc">Shared with your partner — shows in the calendar.</div>
+          </div>
+          <div class="card card--go" style="flex: 1; min-width: 260px;">
+            <div class="card__eyebrow">Flight</div>
+            <div class="card__title">BNE → HAN</div>
+            <div class="card__desc">14 July · 1 traveller · one-way · on Skyscanner</div>
+          </div>
+        </div>
+      </div>
+
+      <h4>HTML</h4>
+<pre class="codeblock"><span class="com">&lt;!-- couples --&gt;</span>
+<span class="tag">&lt;div</span> <span class="at">class</span>=<span class="st">"card card--couples"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span> <span class="at">class</span>=<span class="st">"card__eyebrow"</span><span class="tag">&gt;</span>Our anniversary<span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;h6</span> <span class="at">class</span>=<span class="st">"card__title"</span><span class="tag">&gt;</span>3 January<span class="tag">&lt;/h6&gt;</span>
+  <span class="tag">&lt;p</span> <span class="at">class</span>=<span class="st">"card__desc"</span><span class="tag">&gt;</span>Shared with your partner — shows in the calendar.<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/div&gt;</span></pre>
+
+      <h4>Density</h4>
+      <table class="states">
+        <thead><tr><th>Token</th><th>Couples</th><th>Go</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Padding</td><td class="v">24</td><td class="v">16</td></tr>
+          <tr><td class="k">Radius</td><td class="v">--r-md (14)</td><td class="v">--r-md (14)</td></tr>
+          <tr><td class="k">Border</td><td class="v">1px var(--border)</td><td class="v">1px var(--border)</td></tr>
+          <tr><td class="k">Shadow</td><td class="v">--shadow-sm</td><td class="v">--shadow-sm</td></tr>
+          <tr><td class="k">Hero variant radius</td><td class="v">--r-lg (20)</td><td class="v">--r-lg (20)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        <b>Don&rsquo;t.</b> Add <code>overflow: hidden</code> globally. Cards with overflow break box-shadows. If a card needs to clip a child image, scope the clip to the image element, not the whole card.
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== INPUT ============== -->
+  <section id="input">
+    <h2><span class="num">4 · Input</span>One style, four states</h2>
+
+    <div class="comp">
+      <div class="comp-head">
+        <span class="id">P-03</span>
+        <h3>Input</h3>
+        <div class="props">.field · .field__label · .input · .input--error</div>
+      </div>
+      <p class="purpose">Replaces today&rsquo;s mix of pink-bordered, grey-fill borderless, and thick-pink-border inputs. One token set, four states, applied everywhere — date picker, email, search, story textarea.</p>
+
+      <h4>Live</h4>
+      <div class="nv demo" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div class="field">
+          <label class="field__label">Resting</label>
+          <input class="input" placeholder="Just a first name is fine" />
+        </div>
+        <div class="field">
+          <label class="field__label">Filled</label>
+          <input class="input" value="Charlie" />
+        </div>
+        <div class="field">
+          <label class="field__label">Focused (try clicking)</label>
+          <input class="input" placeholder="charlie@example.com" />
+        </div>
+        <div class="field">
+          <label class="field__label">Error</label>
+          <input class="input input--error" value="not-an-email" />
+        </div>
+      </div>
+
+      <h4>HTML</h4>
+<pre class="codeblock"><span class="tag">&lt;label</span> <span class="at">class</span>=<span class="st">"field"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;span</span> <span class="at">class</span>=<span class="st">"field__label"</span><span class="tag">&gt;</span>Your email<span class="tag">&lt;/span&gt;</span>
+  <span class="tag">&lt;input</span> <span class="at">class</span>=<span class="st">"input"</span> <span class="at">type</span>=<span class="st">"email"</span> <span class="at">placeholder</span>=<span class="st">"<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a9d0c6dce9ccd1c8c4d9c5cc87cac6c4">[email&#160;protected]</a>"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/label&gt;</span></pre>
+
+      <h4>States</h4>
+      <table class="states">
+        <thead><tr><th>State</th><th>Border</th><th>Background</th><th>Other</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Resting</td><td class="v">var(--border)</td><td class="v">var(--white)</td><td>—</td></tr>
+          <tr><td class="k">Hover</td><td class="v">var(--border-hover)</td><td class="v">var(--white)</td><td>—</td></tr>
+          <tr><td class="k">Focus</td><td class="v">var(--pink-500)</td><td class="v">var(--white)</td><td class="v">box-shadow: 0 0 0 3px rgba(244,63,106,.12)</td></tr>
+          <tr><td class="k">Filled</td><td class="v">var(--border)</td><td class="v">var(--white)</td><td>text in var(--ink)</td></tr>
+          <tr><td class="k">Disabled</td><td class="v">var(--border)</td><td class="v">var(--cream)</td><td>opacity 0.6 · cursor not-allowed</td></tr>
+          <tr><td class="k">Error</td><td class="v">var(--pink-600)</td><td class="v">var(--white)</td><td>focus ring uses pink-600 @ 0.18</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        <b>Textarea</b> uses the same class. Set <code>min-height: 90px</code> and <code>resize: vertical</code>. Date pickers wrap the native control with a trailing <code>ph ph-calendar-blank</code> icon at <code>position: absolute; right: 14; top: 13;</code> in pink-500.
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== CHIP + SEGMENTED ============== -->
+  <section id="chip-seg">
+    <h2><span class="num">5 · Chip &amp; segmented</span>Two small <em>but loud</em> primitives</h2>
+
+    <div class="comp">
+      <div class="comp-head">
+        <span class="id">P-04</span>
+        <h3>Chip</h3>
+        <div class="props">.chip · [aria-pressed="true"]</div>
+      </div>
+      <p class="purpose">Replaces today&rsquo;s light-blue Go pills and the couples filter chips. Active state uses ARIA, not a class — keeps it accessible.</p>
+
+      <div class="nv demo">
+        <div class="demo-row">
+          <button class="chip"><i class="ph ph-heart"></i>Romantic evening</button>
+          <button class="chip">Outdoor adventure</button>
+          <button class="chip" aria-pressed="true">Foodie experience</button>
+          <button class="chip">Something creative</button>
+        </div>
+      </div>
+
+<pre class="codeblock"><span class="tag">&lt;button</span> <span class="at">class</span>=<span class="st">"chip"</span> <span class="at">aria-pressed</span>=<span class="st">"true"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;i</span> <span class="at">class</span>=<span class="st">"ph ph-heart"</span><span class="tag">&gt;&lt;/i&gt;</span>
+  Foodie experience
+<span class="tag">&lt;/button&gt;</span></pre>
+    </div>
+
+    <div class="comp">
+      <div class="comp-head">
+        <span class="id">P-05</span>
+        <h3>Segmented control</h3>
+        <div class="props">.segmented · .segmented__opt[aria-selected]</div>
+      </div>
+      <p class="purpose">Replaces the black active state on Memories index and the Go trip-detail tabs. Pink-tinted active, pill shape, single component.</p>
+
+      <div class="nv demo">
+        <div class="demo-row">
+          <div class="segmented" role="tablist">
+            <button class="segmented__opt" aria-selected="true" role="tab"><i class="ph ph-chart-bar"></i>Timeline</button>
+            <button class="segmented__opt" role="tab"><i class="ph ph-grid-four"></i>Gallery</button>
+            <button class="segmented__opt" role="tab"><i class="ph ph-map-pin"></i>Map</button>
+          </div>
+        </div>
+      </div>
+
+<pre class="codeblock"><span class="tag">&lt;div</span> <span class="at">class</span>=<span class="st">"segmented"</span> <span class="at">role</span>=<span class="st">"tablist"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;button</span> <span class="at">class</span>=<span class="st">"segmented__opt"</span> <span class="at">aria-selected</span>=<span class="st">"true"</span> <span class="at">role</span>=<span class="st">"tab"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;i</span> <span class="at">class</span>=<span class="st">"ph ph-chart-bar"</span><span class="tag">&gt;&lt;/i&gt;</span>
+    Timeline
+  <span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;button</span> <span class="at">class</span>=<span class="st">"segmented__opt"</span> <span class="at">role</span>=<span class="st">"tab"</span><span class="tag">&gt;</span>Gallery<span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;button</span> <span class="at">class</span>=<span class="st">"segmented__opt"</span> <span class="at">role</span>=<span class="st">"tab"</span><span class="tag">&gt;</span>Map<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/div&gt;</span></pre>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== COUNTDOWN ============== -->
+  <section id="countdown">
+    <h2><span class="num">6 · The countdown</span>The <em>signature</em>. Same component, both products.</h2>
+    <p class="lede">The single most important component. Pink-500 → pink-400 gradient, Fraunces 76px numeral, italic &ldquo;days to go&rdquo;, two ghost buttons. Couples adds floating 💕; Go prepends a destination photo strip. The card itself never changes.</p>
+
+    <div class="comp">
+      <div class="comp-head">
+        <span class="id">P-07</span>
+        <h3>Countdown</h3>
+        <div class="props">.countdown · .countdown__{photo,body,hearts,eyebrow,place,meta,numeral,unit,actions,ghost}</div>
+      </div>
+
+      <h4>Couples variant (floating hearts)</h4>
+      <div class="nv demo" style="background: var(--cream);">
+        <div class="countdown" style="max-width: 400px; margin: 0 auto;">
+          <div class="countdown__body">
+            <div class="countdown__hearts">💕</div>
+            <div class="countdown__eyebrow">Next visit</div>
+            <div class="countdown__place">Chiang Mai, <em>Thailand</em></div>
+            <div class="countdown__meta">2 Jun → 9 Jun · 7 nights</div>
+            <div class="countdown__numeral">19<span class="countdown__unit">days to go</span></div>
+            <div class="countdown__actions">
+              <button class="countdown__ghost"><i class="ph ph-list-bullets"></i>Trip details</button>
+              <button class="countdown__ghost"><i class="ph ph-paper-plane-tilt"></i>Share</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h4>Go variant (destination photo strip)</h4>
+      <div class="nv demo" style="background: var(--cream-2);">
+        <div class="countdown" style="max-width: 400px; margin: 0 auto;">
+          <div class="countdown__photo" style="background:
+            repeating-linear-gradient(135deg, rgba(255,255,255,.10) 0 12px, rgba(255,255,255,.04) 12px 24px),
+            linear-gradient(135deg, var(--pink-600), var(--pink-400));"></div>
+          <div class="countdown__body">
+            <div class="countdown__eyebrow">Your trip</div>
+            <div class="countdown__place">Chiang Mai, <em>Thailand</em></div>
+            <div class="countdown__meta">2 Jun → 9 Jun · 7 nights · 1 traveller</div>
+            <div class="countdown__numeral">19<span class="countdown__unit">days to go</span></div>
+            <div class="countdown__actions">
+              <button class="countdown__ghost"><i class="ph ph-copy"></i>Copy as text</button>
+              <button class="countdown__ghost"><i class="ph ph-paper-plane-tilt"></i>Share link</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h4>HTML — full structure</h4>
+<pre class="codeblock"><span class="tag">&lt;div</span> <span class="at">class</span>=<span class="st">"countdown"</span><span class="tag">&gt;</span>
+
+  <span class="com">&lt;!-- Go variant only: destination photo strip --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="at">class</span>=<span class="st">"countdown__photo"</span>
+       <span class="at">style</span>=<span class="st">"background-image: url('/dest/chiang-mai.jpg');"</span><span class="tag">&gt;&lt;/div&gt;</span>
+
+  <span class="tag">&lt;div</span> <span class="at">class</span>=<span class="st">"countdown__body"</span><span class="tag">&gt;</span>
+    <span class="com">&lt;!-- Couples variant only --&gt;</span>
+    <span class="tag">&lt;div</span> <span class="at">class</span>=<span class="st">"countdown__hearts"</span><span class="tag">&gt;</span>💕<span class="tag">&lt;/div&gt;</span>
+
+    <span class="tag">&lt;div</span> <span class="at">class</span>=<span class="st">"countdown__eyebrow"</span><span class="tag">&gt;</span>Next visit<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="at">class</span>=<span class="st">"countdown__place"</span><span class="tag">&gt;</span>Chiang Mai, <span class="tag">&lt;em&gt;</span>Thailand<span class="tag">&lt;/em&gt;&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="at">class</span>=<span class="st">"countdown__meta"</span><span class="tag">&gt;</span>2 Jun → 9 Jun · 7 nights<span class="tag">&lt;/div&gt;</span>
+
+    <span class="tag">&lt;div</span> <span class="at">class</span>=<span class="st">"countdown__numeral"</span><span class="tag">&gt;</span>
+      19<span class="tag">&lt;span</span> <span class="at">class</span>=<span class="st">"countdown__unit"</span><span class="tag">&gt;</span>days to go<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+
+    <span class="tag">&lt;div</span> <span class="at">class</span>=<span class="st">"countdown__actions"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;button</span> <span class="at">class</span>=<span class="st">"countdown__ghost"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;i</span> <span class="at">class</span>=<span class="st">"ph ph-list-bullets"</span><span class="tag">&gt;&lt;/i&gt;</span>Trip details
+      <span class="tag">&lt;/button&gt;</span>
+      <span class="tag">&lt;button</span> <span class="at">class</span>=<span class="st">"countdown__ghost"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;i</span> <span class="at">class</span>=<span class="st">"ph ph-paper-plane-tilt"</span><span class="tag">&gt;&lt;/i&gt;</span>Share
+      <span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span></pre>
+
+      <h4>Variants</h4>
+      <table class="states">
+        <thead><tr><th>Anatomy</th><th>Couples</th><th>Go</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Photo strip</td><td class="v">omit</td><td class="v">120px destination photo</td></tr>
+          <tr><td class="k">Floating hearts</td><td class="v">💕 @ opacity 0.4, top: 12, right: 16</td><td class="v">omit</td></tr>
+          <tr><td class="k">Eyebrow text</td><td class="v">&ldquo;Next visit&rdquo;</td><td class="v">&ldquo;Your trip&rdquo;</td></tr>
+          <tr><td class="k">Meta line</td><td class="v">dates · nights</td><td class="v">dates · nights · travellers</td></tr>
+          <tr><td class="k">Actions</td><td class="v">Trip details · Share</td><td class="v">Copy as text · Share link</td></tr>
+          <tr><td class="k">Gradient</td><td class="v">--pink-500 → --pink-400</td><td class="v">--pink-500 → --pink-400</td></tr>
+          <tr><td class="k">Numeral</td><td class="v">Fraunces 600 · 76px</td><td class="v">Fraunces 600 · 76px</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        <b>Real photo.</b> In production, the Go variant&rsquo;s <code>.countdown__photo</code> takes a real <code>background-image: url(...)</code> from your destination cache. Default to the gradient placeholder if the image fails to load (use <code>background</code> shorthand so both rules are present and the gradient sits underneath).
+      </div>
+
+      <div class="note">
+        <b>Animation.</b> On arrival from the Go save flow, the countdown should fade in <code>opacity 0 → 1</code> over <code>--dur-slow</code> (400ms) with a 200ms delay after the Arrival card. <code>prefers-reduced-motion</code> skips the animation entirely.
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== AFFILIATE ============== -->
+  <section id="affil">
+    <h2><span class="num">7 · Affiliate row</span>Identity preserved, <em>calm</em> restored</h2>
+
+    <div class="comp">
+      <div class="comp-head">
+        <span class="id">P-06</span>
+        <h3>Affiliate row</h3>
+        <div class="props">.affil · .affil__monogram (inline brand color) · .affil__name · .affil__sub</div>
+      </div>
+      <p class="purpose">Replaces today&rsquo;s seven full-bleed colored cards (Booking navy, Klook red, Viator green, GYG teal, etc.). Neutral surface; partner brand color survives in the small 34×34 monogram tile only.</p>
+
+      <h4>Live</h4>
+      <div class="nv demo" style="display: flex; flex-direction: column; gap: 10px; max-width: 400px;">
+        <a class="affil" href="#">
+          <span class="affil__monogram" style="background: #003580;">B.</span>
+          <span style="flex: 1; min-width: 0;">
+            <span class="affil__name">Booking.com</span><br>
+            <span class="affil__sub">Hotels in Chiang Mai</span>
+          </span>
+          <i class="ph ph-arrow-up-right" style="font-size: 15px; color: var(--ink-faint);"></i>
+        </a>
+        <a class="affil" href="#">
+          <span class="affil__monogram" style="background: #C02828;">K</span>
+          <span style="flex: 1; min-width: 0;">
+            <span class="affil__name">Klook</span><br>
+            <span class="affil__sub">Tours &amp; activities in Chiang Mai</span>
+          </span>
+          <i class="ph ph-arrow-up-right" style="font-size: 15px; color: var(--ink-faint);"></i>
+        </a>
+        <a class="affil" href="#">
+          <span class="affil__monogram" style="background: #3D2EB8;">A</span>
+          <span style="flex: 1; min-width: 0;">
+            <span class="affil__name">Airalo</span><br>
+            <span class="affil__sub">eSIM data plan for Thailand</span>
+          </span>
+          <i class="ph ph-arrow-up-right" style="font-size: 15px; color: var(--ink-faint);"></i>
+        </a>
+      </div>
+
+      <h4>HTML</h4>
+<pre class="codeblock"><span class="tag">&lt;a</span> <span class="at">class</span>=<span class="st">"affil"</span> <span class="at">href</span>=<span class="st">"..."</span> <span class="at">target</span>=<span class="st">"_blank"</span> <span class="at">rel</span>=<span class="st">"sponsored noopener"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;span</span> <span class="at">class</span>=<span class="st">"affil__monogram"</span> <span class="at">style</span>=<span class="st">"background: #003580;"</span><span class="tag">&gt;</span>B.<span class="tag">&lt;/span&gt;</span>
+  <span class="tag">&lt;span</span> <span class="at">style</span>=<span class="st">"flex: 1;"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;span</span> <span class="at">class</span>=<span class="st">"affil__name"</span><span class="tag">&gt;</span>Booking.com<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;span</span> <span class="at">class</span>=<span class="st">"affil__sub"</span><span class="tag">&gt;</span>Hotels in Chiang Mai<span class="tag">&lt;/span&gt;</span>
+  <span class="tag">&lt;/span&gt;</span>
+  <span class="tag">&lt;i</span> <span class="at">class</span>=<span class="st">"ph ph-arrow-up-right"</span><span class="tag">&gt;&lt;/i&gt;</span>
+<span class="tag">&lt;/a&gt;</span></pre>
+
+      <h4>Partner monogram colors</h4>
+      <table class="states">
+        <thead><tr><th>Partner</th><th>Initial</th><th>Monogram bg</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Booking.com</td><td>B.</td><td class="v">#003580</td></tr>
+          <tr><td class="k">Airbnb</td><td>A</td><td class="v">#FF5A5F</td></tr>
+          <tr><td class="k">Klook</td><td>K</td><td class="v">#C02828</td></tr>
+          <tr><td class="k">Viator</td><td>V</td><td class="v">#1F8A5B</td></tr>
+          <tr><td class="k">GetYourGuide</td><td>G</td><td class="v">#FF6F2D <span style="color: var(--ink-faint);">(was teal; swap to orange or use logo asset)</span></td></tr>
+          <tr><td class="k">DiscoverCars</td><td>D</td><td class="v">#C9651A</td></tr>
+          <tr><td class="k">Airalo</td><td>A</td><td class="v">#3D2EB8</td></tr>
+          <tr><td class="k">SafetyWing</td><td>S</td><td class="v">#1F5E3C</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        <b>Sponsored.</b> Use <code>rel="sponsored noopener"</code> on every affiliate link. Keep <code>target="_blank"</code> so the user doesn&rsquo;t lose the trip context. The Heads-up disclosure stays on every Go results / trip-detail page.
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== HANDOFF + WORDMARK ============== -->
+  <section id="handoff">
+    <h2><span class="num">8 · Handoff card &amp; wordmark</span>The <em>brand glue</em></h2>
+
+    <div class="comp">
+      <div class="comp-head">
+        <span class="id">P-08</span>
+        <h3>Handoff card</h3>
+        <div class="props">.handoff · .handoff__{eyebrow,title,copy,footnote}</div>
+      </div>
+      <p class="purpose">Lives at the end of every Go trip detail. Same gradient + radius as the countdown — visual sibling on purpose, so when you reach the bottom of trip detail you&rsquo;ve already been &ldquo;in Next Visit&rdquo; for half a screen.</p>
+
+      <div class="nv demo">
+        <div class="handoff" style="max-width: 400px; margin: 0 auto;">
+          <div class="handoff__eyebrow">Don&rsquo;t lose this trip</div>
+          <div class="handoff__title">Plan it <em>together →</em></div>
+          <p class="handoff__copy">Save to your shared Next Visit space — countdown the days, share notes &amp; photos, keep memories in one place.</p>
+          <button class="btn btn--on-pink btn--block"><span style="font-size: 14px;">💕</span>Save to Next Visit</button>
+          <div class="handoff__footnote">Anonymous first · Email backup optional · Built for couples</div>
+        </div>
+      </div>
+
+      <h4>The flow (clarified)</h4>
+      <p style="font-size: 14.5px; color: var(--ink-soft);">Per the product decision from the mockups review: <b style="color: var(--ink);">anonymous-first</b>. Tapping &ldquo;Save to Next Visit&rdquo; opens a bottom sheet whose <b style="color: var(--ink);">primary CTA is &ldquo;Open the trip&rdquo;</b> (no email needed). Below it, an unchecked checkbox + email input labeled &ldquo;Email me a backup link.&rdquo; The save persists via URL-param handoff; email is opt-in for cross-device + partner invite. See <code>SaveSeq2EmailOnGo</code> in <code>nv-go.jsx</code> for the markup.</p>
+    </div>
+
+    <div class="comp">
+      <div class="comp-head">
+        <span class="id">P-09</span>
+        <h3>Wordmark</h3>
+        <div class="props">.wordmark · em (Visit) · .glyph (💕)</div>
+      </div>
+      <p class="purpose">One mark, both products. Couples top-right, Go top-left. Same typography lockup, same color, same glyph.</p>
+
+      <div class="nv demo" style="text-align: center;">
+        <div class="wordmark" style="font-size: 22px;">
+          <span>Next</span><em>Visit</em><span class="glyph">💕</span>
+        </div>
+        <div style="margin-top: 10px; font-family: var(--mono); font-size: 11px; color: var(--ink-faint);">at default · scales 14 → 24</div>
+      </div>
+
+<pre class="codeblock"><span class="tag">&lt;a</span> <span class="at">class</span>=<span class="st">"wordmark"</span> <span class="at">href</span>=<span class="st">"/"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;span&gt;</span>Next<span class="tag">&lt;/span&gt;</span><span class="tag">&lt;em&gt;</span>Visit<span class="tag">&lt;/em&gt;</span><span class="tag">&lt;span</span> <span class="at">class</span>=<span class="st">"glyph"</span><span class="tag">&gt;</span>💕<span class="tag">&lt;/span&gt;</span>
+<span class="tag">&lt;/a&gt;</span></pre>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== PATTERNS ============== -->
+  <section id="patterns">
+    <h2><span class="num">9 · Patterns</span>How the components <em>compose</em></h2>
+
+    <h3>The couples Home hero — state machine</h3>
+    <p style="font-size: 14.5px; color: var(--ink-soft);">Replaces today&rsquo;s three-stacked-pink-cards problem. One container, three states. Switch by saved-trip presence + date proximity.</p>
+    <table class="states">
+      <thead><tr><th>State</th><th>When</th><th>What renders</th></tr></thead>
+      <tbody>
+        <tr><td class="k">empty</td><td>no saved trip</td><td>Gentle empty card with single &ldquo;Plan our next trip&rdquo; CTA (see <code>CouplesHomePreTrip</code>)</td></tr>
+        <tr><td class="k">upcoming</td><td>trip dated &gt; today</td><td>Countdown component (see <code>P-07</code>)</td></tr>
+        <tr><td class="k">live</td><td>trip dated within range</td><td>Countdown variant with &ldquo;Day 3 of 7&rdquo; instead of &ldquo;days to go&rdquo; (build later)</td></tr>
+        <tr><td class="k">arrival</td><td>trip just saved from Go</td><td>ArrivalCard pinned above the countdown for 24h, then auto-dismisses</td></tr>
+      </tbody>
+    </table>
+
+    <h3>The Save → arrival choreography</h3>
+    <p style="font-size: 14.5px; color: var(--ink-soft);">The 4-frame sequence from the mockups. Implementation contract:</p>
+    <table class="states">
+      <thead><tr><th>Frame</th><th>Surface</th><th>Trigger</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="k">①</td><td>go.next-visit.app/trip/:id</td><td>resting state, bottom of trip detail</td><td>Handoff card (<code>.handoff</code>) lives here permanently</td></tr>
+        <tr><td class="k">②</td><td>same page, bottom sheet</td><td>tap &ldquo;Save to Next Visit&rdquo;</td><td>Anonymous-first: primary CTA &ldquo;Open the trip&rdquo;; email + checkbox below</td></tr>
+        <tr><td class="k">③</td><td>same page, sheet content swap</td><td>after submit (with or without email)</td><td>Checkmark + &ldquo;Open the trip&rdquo; primary; passes trip JSON via URL hash</td></tr>
+        <tr><td class="k">④</td><td>next-visit.app/save-trip → /</td><td>tap &ldquo;Open the trip&rdquo;</td><td>Couples Home, ArrivalCard fades in, then countdown fades in 200ms later</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>Anonymous-first URL contract.</b> Frame ③ → ④ passes the trip as <code>#trip=&lt;base64(JSON)&gt;</code> on the redirect URL. Couples Home reads the hash, persists to localStorage, and clears the hash. No email = no account; the trip lives on the device. Email = same flow plus a sign-in token POSTed to your existing auth endpoint.
+    </div>
+
+    <h3>The Photos hybrid model</h3>
+    <p style="font-size: 14.5px; color: var(--ink-soft);">Net-new design. Inbox metaphor: photos arrive in Unsorted; user tags into memories.</p>
+    <table class="states">
+      <thead><tr><th>View</th><th>Anatomy</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Memories tab</td><td>Pinned Unsorted strip at top; one section per memory below</td><td>Tap memory → memory detail · tap Unsorted strip → Unsorted view</td></tr>
+        <tr><td class="k">Unsorted view</td><td>Inbox card (count) · sort header · 3-col photo grid</td><td>Tap photo → preview · tap Select → multi-select mode</td></tr>
+        <tr><td class="k">Multi-select mode</td><td>Bottom action bar appears: &ldquo;Tag to memory&rdquo; · &ldquo;Create memory&rdquo; · &ldquo;Delete&rdquo;</td><td>Active multi-select state — build with checkbox overlay on each photo</td></tr>
+      </tbody>
+    </table>
+
+    <h3>The avatar tap target (couples top bar)</h3>
+    <p style="font-size: 14.5px; color: var(--ink-soft);">Per review: the paired avatar in the top-left of every couples screen taps into <b style="color: var(--ink);">Your space</b> — a single screen with profile, partner info, anniversary, notification prefs, and sign-out / delete-account. Implement as a slide-up sheet on mobile, side panel on desktop. Tap target is the entire avatar + name area (~120×40 hit box, not just the avatars).</p>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== IMPLEMENTATION NOTES ============== -->
+  <section id="impl">
+    <h2><span class="num">10 · Implementation</span>Per product, <em>per file</em></h2>
+
+    <div class="impl-row">
+      <div class="impl">
+        <h4>Couples · React/Vite SPA</h4>
+        <ul>
+          <li>Drop tokens at the top of <code>src/styles/tokens.css</code>; import once in <code>main.tsx</code>.</li>
+          <li>Each component becomes a React component with matching class names. Keep CSS modules or scoped CSS — class names stay the same.</li>
+          <li>The countdown component takes props for <code>days</code>, <code>place</code>, <code>placeAccent</code>, <code>meta</code>, <code>actions</code>, <code>hearts</code>. The body is identical in JSX to the markup above.</li>
+          <li>The Home hero state machine is one component switching on a derived <code>tripStatus</code> selector.</li>
+          <li>Arrival animation: <code>framer-motion</code> or plain CSS with <code>@keyframes</code> — respect <code>prefers-reduced-motion</code>.</li>
+        </ul>
+      </div>
+      <div class="impl">
+        <h4>Go · vanilla, single index.html</h4>
+        <ul>
+          <li>Drop tokens in a single <code>&lt;style&gt;</code> block at the top of <code>index.html</code>. Mirror the source of truth — no build step needed.</li>
+          <li>Replace today&rsquo;s blue var with <code>var(--pink-500)</code> globally; the bulk of the rebrand is one search-replace on <code>#0770e3</code>.</li>
+          <li>Each affiliate card swaps from the current full-bleed colored div to <code>.affil</code> markup with an inline-styled monogram. Wholesale rewrite ~80 lines.</li>
+          <li>The countdown is currently rendered inline in trip-detail; lift to a single template literal so both variants (couples-style and go-style) share the same string with a conditional <code>__photo</code> prefix.</li>
+          <li>Keep <code>document.fonts.ready</code> guards around any FOUT-sensitive scripts that measure text.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ============== ROADMAP ============== -->
+  <section id="roadmap">
+    <h2><span class="num">11 · Roadmap</span>The <em>tranche</em> checklist</h2>
+    <p class="lede">Lifted from <code>proposal.html</code>. Each item links to the component / pattern in this spec.</p>
+
+    <div class="tranche t1">
+      <div class="lbl">Tranche 1 · brand fix · week 1</div>
+      <h3>Make it feel unified before any new feature ships.</h3>
+      <ul>
+        <li>Swap Go primary <code>#0770E3</code> → <code>var(--pink-500)</code> globally <span class="ref">tokens · §1</span></li>
+        <li>Neutralize the seven affiliate cards on Go <span class="ref">P-06 · §7</span></li>
+        <li>Retire green/purple/mint accents on Us &amp; Settings <span class="ref">P-02 · §3</span></li>
+        <li>Ship the unified countdown component on both products <span class="ref">P-07 · §6</span></li>
+        <li>Redesign Go trip-detail page (countdown + neutral affiliates + handoff card) <span class="ref">patterns · §9</span></li>
+      </ul>
+    </div>
+
+    <div class="tranche t2">
+      <div class="lbl">Tranche 2 · systematic cleanup · week 2–3</div>
+      <h3>Replace the ad-hoc stuff with primitives.</h3>
+      <ul>
+        <li>Migrate emoji iconography to Phosphor (keep 💕 only) <span class="ref">tokens · §1</span></li>
+        <li>One wordmark, one position, both products <span class="ref">P-09 · §8</span></li>
+        <li>Home hero state machine (empty / upcoming / live / arrival) <span class="ref">patterns · §9</span></li>
+        <li>Redesign AI suggestion button (drop yellow / orange dashed) <span class="ref">P-01 · §2</span></li>
+        <li>Unified segmented control + input style <span class="ref">P-03 · P-05</span></li>
+        <li>Collapse Go&rsquo;s four blues into the pink ramp <span class="ref">tokens · §1</span></li>
+      </ul>
+    </div>
+
+    <div class="tranche t3">
+      <div class="lbl">Tranche 3 · the new moments · week 3–4</div>
+      <h3>What didn&rsquo;t exist before.</h3>
+      <ul>
+        <li>Save → arrival choreography (4-frame sequence, anonymous-first) <span class="ref">patterns · §9</span></li>
+        <li>Photos hybrid model (Unsorted inbox + tagged sections) <span class="ref">patterns · §9</span></li>
+        <li>Results card refinement on Go (KPI row, mobile readability) <span class="ref">cards · §3</span></li>
+        <li>Voice cleanup — remove subdomain disclosures from couples Home <span class="ref">audit X-03</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <section id="closer" style="margin: 56px 0;">
+    <div style="background: var(--white); border: 1px solid var(--border); border-radius: 18px; padding: 40px; box-shadow: var(--shadow-lg);">
+      <div class="crumb" style="margin-bottom: 6px;">Closing</div>
+      <h2>The design phase is <em>done.</em></h2>
+      <p style="font-size: 16px; color: var(--ink-soft); margin-top: 12px;">
+        Four deliverables on file: the audit, the system proposal, the mockups, and this spec. Together they answer <i>what to build</i>, <i>how it should look</i>, <i>what the user sees</i>, and <i>how to write the CSS</i>.
+      </p>
+      <p style="font-size: 15px; color: var(--ink-soft); margin-top: 12px;">
+        Hand this file plus <code>mockups.html</code> to Code Web. Tranche 1 ships the brand fix in a week. The countdown lands on both products. The blue dies. The system holds.
+      </p>
+      <p style="font-size: 14px; color: var(--ink-faint); margin-top: 18px; font-style: italic;">
+        Made for the two of you.
+      </p>
+    </div>
+  </section>
+
+</main>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

@@ -44,28 +44,26 @@ Inside each tile (z-stack, bottom → top):
 ## Construction — `LogoA` (wordmark)
 
 ```
-NEXTVISIT      ← 9 FlapChar tiles
-· 3 · jan ·    ← DM Mono date line, --nv-pink-500
+NEXTVISIT      ← 9 FlapChar tiles (default)
+· 12 · jul ·   ← optional DM Mono date line, --nv-pink-500 — only when a
+                 real next-visit date is on screen
 ```
 
 | Spec | Value |
 |---|---|
 | Tiles | 9 — spelling `NEXTVISIT` |
 | Tile gap | `w * 0.077` (≈ 4 px at default size) |
-| Wordmark-to-date gap | `w * 0.36` |
-| Date line font | `--nv-font-mono` (DM Mono), weight 500 |
-| Date line tracking | `.42em`, uppercase |
-| Date line color | `--nv-pink-500` |
-| Date content | `· 3 · jan ·` — the locked placeholder |
-| Default size | `w=52, h=70, dateSize=13` |
+| Default size | `w=52, h=70` |
+| Date line (opt-in) | font `--nv-font-mono` (DM Mono), weight 500, tracking `.42em`, uppercase, color `--nv-pink-500` |
+| Wordmark-to-date gap (when date present) | `w * 0.36` |
 
-`<LogoA/>` accepts `w`, `h`, `dateSize`, and `date` props.
+`<LogoA/>` accepts `w`, `h`, `dateSize`, and `date` props. **`date` defaults
+to `null`** — the wordmark renders as 9 tiles only.
 
-The date `· 3 · jan ·` is **part of the locked mark**. On the brand page,
-leave it as-is. In product UI where a real date is meaningful (e.g. a
-splash screen showing the user's actual next trip), pass `date="· 12 · jul ·"`
-— but only when the real next-visit date is what's on screen. If you don't
-know the date, use the default.
+Pass `date="· 12 · jul ·"` on splash screens, share cards, marketing
+surfaces, or anywhere a real next-visit date is the moment. Don't pass
+a placeholder date just to "look complete" — if no date is meaningful,
+leave it off.
 
 ---
 
@@ -143,14 +141,15 @@ Make sure it is loaded on any page that renders `<LogoA/>` or `<AppIcon/>`:
 ```jsx
 import { LogoA, AppIcon, FlapChar } from '~/brand/marks';
 
-// Default wordmark (header, footer)
+// Default wordmark — 9 tiles only (header, footer, most surfaces)
 <LogoA />
 
 // Larger wordmark for hero / splash
-<LogoA w={64} h={86} dateSize={15} />
+<LogoA w={64} h={86} />
 
-// Wordmark with a real next-visit date
-<LogoA date="· 12 · jul ·" />
+// Wordmark with a real next-visit date underneath
+// (splash, share cards — only when a real date is on screen)
+<LogoA date="· 12 · jul ·" dateSize={15} />
 
 // App icon at favicon size
 <AppIcon size={32} shadow={false} />

@@ -84,10 +84,12 @@ don't invent variants. Use the existing components.
 
 ### The two marks
 
-- **Logo A (wordmark)** — `NEXTVISIT` in 9 cream split-flap tiles with a
-  pink monospace date line `· 3 · jan ·` beneath. The primary mark.
-  Use wherever a logo would normally appear (header, footer, share cards,
-  marketing pages, splash screens).
+- **Logo A (wordmark)** — `NEXTVISIT` in 9 cream split-flap tiles. The
+  primary mark. Use wherever a logo would normally appear (header,
+  footer, share cards, marketing pages, splash screens). An optional
+  pink mono date line (e.g. `· 12 · jul ·`) can sit beneath — opt-in
+  via the `date` prop, and only when a real next-visit date is on screen
+  (splash, share cards). Default is no date line.
 - **App icon (full bleed)** — The square mark. Two edge-to-edge flap
   tiles: cream **N** on the left, pink **V** on the right. Each glyph is
   nudged toward the centre seam by 7&hairsp;% of the icon size so the

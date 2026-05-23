@@ -90,29 +90,34 @@ export function FlapChar({
 // ─────────────────────────────────────────────────────────────────────
 // LogoA — the wordmark (locked)
 // ─────────────────────────────────────────────────────────────────────
-export function LogoA({ w = 52, h = 70, dateSize, date = '\u00b7 3 \u00b7 jan \u00b7' }) {
+// Default: 9 flap tiles only. Pass a `date` prop (e.g. "\u00b7 12 \u00b7 jul \u00b7")
+// to add the pink mono date line beneath \u2014 reserved for surfaces where
+// a real next-visit date is meaningful (splash, share cards, etc).
+export function LogoA({ w = 52, h = 70, dateSize, date = null }) {
   const tileGap = Math.round(w * 0.077);   // tile-to-tile gap
   const wordToDateGap = w * 0.36;          // wordmark-to-date distance
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: wordToDateGap, alignItems: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: date ? wordToDateGap : 0, alignItems: 'center' }}>
       <div style={{ display: 'flex', gap: tileGap }}>
         {[...'NEXTVISIT'].map((c, i) => (
           <FlapChar key={i} char={c} w={w} h={h} />
         ))}
       </div>
-      <div
-        style={{
-          fontFamily: 'var(--nv-font-mono)',
-          fontSize: dateSize ?? Math.max(9, w * 0.26),
-          letterSpacing: '.42em',
-          color: 'var(--nv-pink-500)',
-          fontWeight: 500,
-          textTransform: 'uppercase',
-          textAlign: 'center',
-        }}
-      >
-        {date}
-      </div>
+      {date && (
+        <div
+          style={{
+            fontFamily: 'var(--nv-font-mono)',
+            fontSize: dateSize ?? Math.max(9, w * 0.26),
+            letterSpacing: '.42em',
+            color: 'var(--nv-pink-500)',
+            fontWeight: 500,
+            textTransform: 'uppercase',
+            textAlign: 'center',
+          }}
+        >
+          {date}
+        </div>
+      )}
     </div>
   );
 }

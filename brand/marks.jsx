@@ -1,7 +1,7 @@
 // Next Visit — Brand Marks (LOCKED)
 //
 // FlapChar     — atomic split-flap tile (the building block)
-// LogoA        — primary wordmark: NEXTVISIT + · 3 · jan ·
+// LogoA        — primary wordmark: NEXTVISIT (optional · date · line)
 // AppIcon      — square app icon: full-bleed N + V
 //
 // These three components are the single source of truth for the Next

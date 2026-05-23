@@ -1,0 +1,185 @@
+/* ============================================================
+   Next Visit — Design Tokens
+   v0.1 · 18 May 2026
+
+   Drop this into your app's global stylesheet (or import it).
+   Every other color/font in the product should reference one of
+   these variables. If you find yourself writing a raw hex, stop —
+   that token is missing from this file. Add it here instead.
+   ============================================================ */
+
+:root {
+  /* ── Color · Navy (structural) ───────────────────────────── */
+  --nv-navy-50:  #eef2f8;
+  --nv-navy-100: #dde4ee;
+  --nv-navy-200: #c5cee0;
+  --nv-navy-300: #93a3c2;
+  --nv-navy-400: #5a6f93;
+  --nv-navy-500: #3a527b;
+  --nv-navy-600: #233c64;
+  --nv-navy-700: #142b4d;
+  --nv-navy-800: #0e2240;   /* brand navy */
+  --nv-navy-900: #091a32;
+  --nv-navy-950: #05111f;
+
+  /* ── Color · Cream (warm neutral surfaces) ───────────────── */
+  --nv-paper:    #fafaf7;
+  --nv-cream-50: #fbf3ed;
+  --nv-cream-100:#fbe8de;   /* brand cream */
+  --nv-cream-200:#f6dccb;
+  --nv-cream-300:#eccab4;
+
+  /* ── Color · Pink (the accent — use sparingly) ───────────── */
+  --nv-pink-50:  #fdeaf2;
+  --nv-pink-100: #fcd0e0;
+  --nv-pink-200: #f7a5c1;
+  --nv-pink-300: #f17ba2;
+  --nv-pink-400: #ee5a8b;
+  --nv-pink-500: #ec4079;   /* brand pink */
+  --nv-pink-600: #d12c64;
+  --nv-pink-700: #a92050;
+  --nv-pink-800: #82173d;
+
+  /* ── Color · Brand marks (do not use outside the logo / icon) ─ */
+  --nv-tile-bg:   #06122a;   /* split-flap tile inner */
+  --nv-tile-glyph: var(--nv-cream-100);
+  --nv-tile-accent: var(--nv-pink-500);
+
+  /* ── Color · Semantic ────────────────────────────────────── */
+  --nv-success:    #2f9968;
+  --nv-success-bg: #e6f3ec;
+  --nv-warning:    #d99021;
+  --nv-warning-bg: #fbf0d9;
+  --nv-error:      #c83838;
+  --nv-error-bg:   #fbe5e1;
+
+  /* ── Semantic aliases · use these in components ──────────── */
+  /* Map the raw scale to roles. Components should reference
+     the role tokens, not the scale, so a future re-theme is cheap. */
+  --nv-bg-page:        var(--nv-paper);
+  --nv-bg-surface:     #ffffff;
+  --nv-bg-subtle:      var(--nv-cream-50);
+  --nv-bg-hover:       var(--nv-navy-50);
+  --nv-bg-dark:        var(--nv-navy-800);
+  --nv-bg-darker:      var(--nv-navy-900);
+
+  --nv-text-primary:   var(--nv-navy-800);
+  --nv-text-secondary: var(--nv-navy-600);
+  --nv-text-muted:     var(--nv-navy-400);
+  --nv-text-on-dark:   var(--nv-cream-100);
+  --nv-text-on-pink:   #ffffff;
+
+  --nv-border-subtle:  var(--nv-navy-100);
+  --nv-border-strong:  var(--nv-navy-200);
+  --nv-border-focus:   var(--nv-pink-500);
+
+  --nv-accent:         var(--nv-pink-500);
+  --nv-accent-hover:   var(--nv-pink-600);
+  --nv-accent-soft:    var(--nv-pink-50);
+
+  /* ── Type ────────────────────────────────────────────────── */
+  --nv-font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --nv-font-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --nv-font-mono:  'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --nv-font-mark:  'Space Grotesk', 'DM Mono', monospace; /* ONLY for the brand mark glyphs — never body UI */
+
+  /* Type scale (rem-based, body = 1rem = 15px recommended) */
+  --nv-text-xs:    0.75rem;    /* 11px  · labels, captions */
+  --nv-text-sm:    0.8125rem;  /* 13px  · meta, hint text */
+  --nv-text-base:  0.9375rem;  /* 15px  · body */
+  --nv-text-md:    1rem;       /* 16px  · prominent body */
+  --nv-text-lg:    1.1875rem;  /* 19px  · lede */
+  --nv-text-xl:    1.375rem;   /* 22px  · h3 */
+  --nv-text-2xl:   1.75rem;    /* 28px  · h2 small */
+  --nv-text-3xl:   2.625rem;   /* 42px  · h2 */
+  --nv-text-4xl:   3.5rem;     /* 56px  · h1 small */
+  --nv-text-5xl:   5.5rem;     /* 88px  · h1 hero */
+
+  --nv-weight-regular:  400;
+  --nv-weight-medium:   500;
+  --nv-weight-semibold: 600;
+  --nv-weight-bold:     700;
+
+  --nv-leading-tight:   1.05;
+  --nv-leading-snug:    1.25;
+  --nv-leading-normal:  1.55;
+
+  --nv-tracking-tight: -0.025em;
+  --nv-tracking-snug:  -0.01em;
+  --nv-tracking-mono:   0.08em;
+  --nv-tracking-wide:   0.18em;
+  --nv-tracking-widest: 0.32em;
+
+  /* ── Spacing scale (4-based) ─────────────────────────────── */
+  --nv-space-1:  4px;
+  --nv-space-2:  8px;
+  --nv-space-3:  12px;
+  --nv-space-4:  16px;
+  --nv-space-5:  20px;
+  --nv-space-6:  24px;
+  --nv-space-8:  32px;
+  --nv-space-10: 40px;
+  --nv-space-12: 48px;
+  --nv-space-16: 64px;
+  --nv-space-20: 80px;
+
+  /* ── Radii ───────────────────────────────────────────────── */
+  --nv-radius-sm: 4px;
+  --nv-radius-md: 8px;
+  --nv-radius-lg: 12px;
+  --nv-radius-xl: 16px;
+  --nv-radius-pill: 9999px;
+
+  /* ── Shadows ─────────────────────────────────────────────── */
+  --nv-shadow-sm:  0 1px 0 rgba(14, 34, 64, 0.06);
+  --nv-shadow-md:  0 1px 0 var(--nv-navy-100), 0 0 0 1px rgba(14, 34, 64, 0.04);
+  --nv-shadow-lg:  0 4px 24px rgba(14, 34, 64, 0.12), 0 0 0 1px var(--nv-navy-100);
+  --nv-shadow-xl:  0 12px 40px rgba(14, 34, 64, 0.18);
+  --nv-shadow-focus: 0 0 0 3px var(--nv-pink-100);
+
+  /* ── Motion ──────────────────────────────────────────────── */
+  --nv-ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --nv-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --nv-dur-fast:   120ms;
+  --nv-dur-base:   200ms;
+  --nv-dur-slow:   320ms;
+}
+
+/* ── Dark theme override (apply via data-theme or media query) ── */
+[data-theme="dark"] {
+  --nv-bg-page:        var(--nv-navy-900);
+  --nv-bg-surface:     var(--nv-navy-800);
+  --nv-bg-subtle:      var(--nv-navy-700);
+  --nv-bg-hover:       rgba(251, 232, 222, 0.06);
+
+  --nv-text-primary:   var(--nv-cream-100);
+  --nv-text-secondary: var(--nv-cream-200);
+  --nv-text-muted:     rgba(251, 232, 222, 0.55);
+
+  --nv-border-subtle:  rgba(251, 232, 222, 0.08);
+  --nv-border-strong:  rgba(251, 232, 222, 0.16);
+
+  --nv-accent-soft:    rgba(236, 64, 121, 0.18);
+
+  --nv-shadow-sm:      0 1px 0 rgba(0, 0, 0, 0.4);
+  --nv-shadow-md:      0 1px 0 var(--nv-navy-900), 0 0 0 1px rgba(0, 0, 0, 0.2);
+  --nv-shadow-focus:   0 0 0 3px rgba(236, 64, 121, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --nv-bg-page:        var(--nv-navy-900);
+    --nv-bg-surface:     var(--nv-navy-800);
+    --nv-bg-subtle:      var(--nv-navy-700);
+    --nv-bg-hover:       rgba(251, 232, 222, 0.06);
+
+    --nv-text-primary:   var(--nv-cream-100);
+    --nv-text-secondary: var(--nv-cream-200);
+    --nv-text-muted:     rgba(251, 232, 222, 0.55);
+
+    --nv-border-subtle:  rgba(251, 232, 222, 0.08);
+    --nv-border-strong:  rgba(251, 232, 222, 0.16);
+
+    --nv-accent-soft:    rgba(236, 64, 121, 0.18);
+  }
+}
